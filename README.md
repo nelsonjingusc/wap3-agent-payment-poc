@@ -4,29 +4,6 @@
 
 ---
 
-## ⚡ Quick Start (For Reviewers)
-
-Want to see autonomous AI agents in action? Run our interactive demo:
-
-```bash
-# 1. Clone and install
-git clone https://github.com/gioroxai/wap3-agent-payment-poc.git
-cd wap3-agent-payment-poc
-npm install && npm run compile
-
-# 2. Terminal 1: Start autonomous agent
-npm run demo:agent
-
-# 3. Terminal 2: Create a task (copy addresses from Terminal 1)
-npm run demo:buyer
-```
-
-Watch as the agent automatically detects tasks, executes AI work, and receives payment. **Total time: ~10 seconds**
-
-📖 **[Full Demo Guide](demo/README.md)** • 🧪 **Run tests:** `npm test`
-
----
-
 ## About Us
 
 **GioroX AI** builds programmable settlement and escrow protocols that enable autonomous AI agents to transact, verify, and collaborate securely across Web3 ecosystems.
@@ -120,7 +97,28 @@ Watch as the agent:
 
 **[Full Demo Guide](demo/README.md)** • **[Video Tutorial](#)** (coming soon)
 
-👉 **[Read the Technical Documentation](TECHNICAL.md)** for implementation details, quick start guide, and API reference.
+---
+
+## ⚡ Quick Start
+
+Want to see autonomous AI agents in action? Run our interactive demo:
+
+```bash
+# 1. Clone and install
+git clone https://github.com/gioroxai/wap3-agent-payment-poc.git
+cd wap3-agent-payment-poc
+npm install && npm run compile
+
+# 2. Terminal 1: Start autonomous agent
+npm run demo:agent
+
+# 3. Terminal 2: Create a task (copy addresses from Terminal 1)
+npm run demo:buyer
+```
+
+Watch as the agent automatically detects tasks, executes AI work, and receives payment. **Total time: ~10 seconds**
+
+📖 **[Full Demo Guide](demo/README.md)** • 🧪 **Run tests:** `npm test` • 📚 **[Technical Docs](TECHNICAL.md)**
 
 ---
 
