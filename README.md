@@ -4,6 +4,29 @@
 
 ---
 
+## ⚡ Quick Start (For Reviewers)
+
+Want to see autonomous AI agents in action? Run our interactive demo:
+
+```bash
+# 1. Clone and install
+git clone https://github.com/gioroxai/wap3-agent-payment-poc.git
+cd wap3-agent-payment-poc
+npm install && npm run compile
+
+# 2. Terminal 1: Start autonomous agent
+npm run demo:agent
+
+# 3. Terminal 2: Create a task (copy addresses from Terminal 1)
+npm run demo:buyer
+```
+
+Watch as the agent automatically detects tasks, executes AI work, and receives payment. **Total time: ~10 seconds**
+
+📖 **[Full Demo Guide](demo/README.md)** • 🧪 **Run tests:** `npm test`
+
+---
+
 ## About Us
 
 **GioroX AI** builds programmable settlement and escrow protocols that enable autonomous AI agents to transact, verify, and collaborate securely across Web3 ecosystems.
@@ -71,6 +94,31 @@ This repository contains our first public proof-of-concept: a minimal escrow con
 - ✅ Full TypeScript support with auto-generated types
 - ✅ Gas-optimized contracts (~100k gas for escrow creation)
 - ✅ Chain-agnostic (works on any EVM network)
+- ✅ **Live autonomous agent demo** (see below)
+
+### 🎬 Try the Autonomous Agent Demo
+
+Experience the future of AI agent payments with our **interactive two-terminal demo**:
+
+**Terminal 1 (Agent):** Autonomous AI agent that listens for tasks, executes work, and submits proof
+**Terminal 2 (Buyer):** Create tasks and watch agents complete them automatically
+
+```bash
+# Terminal 1: Start the autonomous agent
+npm run demo:agent
+
+# Terminal 2: Create a task (after agent is running)
+npm run demo:buyer
+```
+
+Watch as the agent:
+- 🔔 Detects new tasks on-chain
+- 🧠 Executes AI work (simulated sentiment analysis)
+- 📦 Uploads results to IPFS (simulated)
+- ✅ Submits cryptographic proof
+- 💰 Receives payment automatically
+
+**[Full Demo Guide](demo/README.md)** • **[Video Tutorial](#)** (coming soon)
 
 👉 **[Read the Technical Documentation](TECHNICAL.md)** for implementation details, quick start guide, and API reference.
 
@@ -167,6 +215,7 @@ For partnership inquiries, investment opportunities, or technical collaboration,
 
 ## Quick Links
 
+- 🎬 **[Autonomous Agent Demo](demo/README.md)** — Interactive demo showing real agent automation
 - 📖 **[Technical Documentation](TECHNICAL.md)** — Full implementation guide, API reference, and quick start
 - 📝 **[Smart Contract](contracts/AgentEscrow.sol)** — Escrow contract source code
 - 🧪 **[Test Suite](test/AgentEscrow.test.ts)** — Comprehensive test coverage
