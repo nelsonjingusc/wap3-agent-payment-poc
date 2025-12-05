@@ -12,6 +12,8 @@
     "deploy": "hardhat run scripts/deploy.ts",
     "deploy:localhost": "hardhat run scripts/deploy.ts --network localhost",
     "demo": "hardhat run scripts/demo-agent-payment.ts --network localhost",
+    "demo:agent": "hardhat run demo/agent-service.ts --network localhost",
+    "demo:buyer": "hardhat run demo/buyer-client.ts --network localhost",
     "example:simple": "hardhat run examples/01-simple-payment.ts --network localhost",
     "example:refund": "hardhat run examples/02-refund-scenario.ts --network localhost",
     "example:multiple": "hardhat run examples/03-multiple-tasks.ts --network localhost",
