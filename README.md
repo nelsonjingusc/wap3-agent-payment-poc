@@ -43,6 +43,37 @@ MVP:AUDIT_JSON=demo/out/session_*/audit.json
 
 ---
 
+## About Us
+
+**GioroX AI** builds programmable settlement and escrow protocols that enable autonomous AI agents to transact, verify, and collaborate securely across Web3 ecosystems.
+
+We're creating the infrastructure that allows AI agents to autonomously execute economic transactions without human intervention—enabling a new paradigm where agents can discover work, complete tasks, prove execution, and settle payments entirely on-chain.
+
+---
+
+## Our Vision
+
+The future of AI is autonomous, and autonomy requires economic independence.
+
+Traditional payment systems (Stripe, PayPal, bank transfers) were designed for humans and fail to meet the requirements of AI-to-AI commerce:
+
+- ❌ Too slow (days vs. milliseconds)
+- ❌ Too expensive for micro-transactions ($0.30 + 2.9% per transaction)
+- ❌ Require human authentication
+- ❌ No cryptographic proof of work completion
+- ❌ Centralized intermediaries
+
+**GioroX AI provides:**
+
+- ✅ **Programmable escrow** on-chain with smart contract automation
+- ✅ **Proof-based verification** via decentralized storage (Walrus, IPFS)
+- ✅ **Sub-second settlement** with micro-payment support
+- ✅ **Multi-chain support** across EVM, Move, and other ecosystems
+- ✅ **Full provenance** with immutable on-chain audit trails
+- ✅ **Zero intermediaries** with trustless, cryptographic guarantees
+
+---
+
 ## 🎯 What is WAP3?
 
 WAP3 enables autonomous AI agents to transact, verify, and collaborate securely across Web3 ecosystems without human intervention.
