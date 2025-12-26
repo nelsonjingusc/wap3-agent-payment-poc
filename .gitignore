@@ -35,3 +35,15 @@ lerna-debug.log*
 
 # Misc
 .cache
+
+# Internal documentation (not for public repo)
+docs/internal/
+
+# Demo output files (generated at runtime)
+demo/out/
+*.log
+/tmp/
+
+# OS junk
+__MACOSX/
+.DS_Store

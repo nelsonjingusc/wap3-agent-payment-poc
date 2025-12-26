@@ -1,18 +1,232 @@
-# WAP3 Autonomous Agent Demo
+# WAP3 Demo Guide
 
-This demo showcases the **core value proposition** of WAP3: autonomous AI agents that can execute tasks and receive payment without human intervention.
+## 🎯 Quick Start
 
-## What This Demonstrates
+**Run the complete demo in one command:**
 
-Unlike traditional smart contract demos that just show wallet interactions, this demo shows:
+```bash
+./demo/run_mvp_demo.sh
+```
 
-- 🤖 **Autonomous agents** that listen for tasks on-chain
-- 🧠 **Real AI work** (simulated sentiment analysis)
-- 📦 **Decentralized storage** (simulated IPFS upload)
-- ⚡ **Instant settlement** once work is verified
-- 🔗 **Zero intermediaries** — fully trustless execution
+This demonstrates the full agent transaction lifecycle:
+- AP2 Intent → X402 Trigger → Escrow → Proof → Settlement → Audit
 
-## How It Works
+**Expected output:**
+```
+MVP:AP2_INTENT_ID=0x...
+MVP:X402_PAYMENT_ID=0x...
+MVP:ESCROW_ID=0
+MVP:PROOF_HASH=0x...
+MVP:SETTLE_TX=0x...
+MVP:AUDIT_JSON=demo/out/session_*/audit.json
+```
+
+---
+
+## 🎬 Demo Modes
+
+### Mode 1: MVP Demo (One-Command, Recommended)
+
+**Best for presentations and video demos:**
+
+```bash
+./demo/run_mvp_demo.sh
+```
+
+**What it does:**
+1. Starts Hardhat node (if needed)
+2. Deploys AgentEscrow contract
+3. Starts autonomous agent service
+4. Creates escrow with AP2 intent and X402 trigger
+5. Waits for agent to complete task
+6. Settles payment automatically
+7. Generates audit JSON record
+
+**Features:**
+- ✅ Non-interactive (no manual input)
+- ✅ Stable output (MVP: prefixes for parsing)
+- ✅ Complete audit trail
+- ✅ Auto-compile detection (falls back to --no-compile if needed)
+
+### Mode 2: Dual-Agent Demo (LangGraph Integration)
+
+**Showcases two agents collaborating:**
+
+```bash
+npm run demo:dual-agent
+```
+
+**What it demonstrates:**
+- 🤖 **Buyer Agent** (LangGraph): Task planning → Intent → Trigger → Escrow
+- 🤖 **Service Agent**: Listen → Execute → Submit Proof
+- ✅ Full LangGraph workflow orchestration
+- ✅ Real multi-agent collaboration
+
+### Mode 3: Manual Two-Terminal Demo
+
+**For interactive testing and debugging:**
+
+**Terminal 1 - Start Service Agent:**
+```bash
+npm run demo:agent
+```
+
+Wait for output:
+```
+MVP_INFO contract=0x... agent=0x... rpc=http://127.0.0.1:8545
+```
+
+**Terminal 2 - Run Buyer Client:**
+```bash
+npm run demo:buyer
+```
+
+Or use LangGraph Buyer Agent:
+```bash
+npm run demo:buyer-agent
+```
+
+---
+
+## 📋 Prerequisites
+
+- Node.js 18+ and npm
+- Hardhat development environment
+- Local Hardhat node (auto-started by scripts)
+
+**Installation:**
+```bash
+npm install
+```
+
+---
+
+## 🔍 What Gets Demonstrated
+
+### For Reviewers / Grant Evaluators
+
+1. **Real Automation** - Agent operates autonomously, no human clicks
+2. **AI Integration** - Shows how AI agents integrate with blockchain payments
+3. **Decentralized Storage** - Demonstrates off-chain storage with on-chain verification
+4. **Instant Settlement** - Payment happens automatically once proof is verified
+5. **Scalability** - One agent can handle multiple tasks from multiple buyers
+
+### For Developers
+
+1. **Event-Driven Architecture** - Agent listens to on-chain events
+2. **Async Workflow** - Real-world async task execution pattern
+3. **Proof-Based Verification** - Cryptographic proof instead of trust
+4. **Gas Efficiency** - Minimal on-chain operations, complex work off-chain
+
+### For Business Partners
+
+1. **New Business Model** - Enables pay-per-task AI services
+2. **Trustless** - No need to trust the agent or the buyer
+3. **Transparent** - All transactions verifiable on-chain
+4. **Composable** - Can integrate with any EVM chain
+
+---
+
+## 📁 Output Files
+
+All demo runs generate files in `demo/out/`:
+
+- `mvp_runtime.json` - Runtime configuration (contract, agent, rpc)
+- `session_*/intent.json` - AP2 intent data
+- `session_*/trigger.json` - X402 trigger data
+- `session_*/audit.json` - Complete audit record
+
+**Example audit structure:**
+```json
+{
+  "intent": {
+    "intent_id": "0x...",
+    "ap2_version": "2025-q3",
+    "hash": "0x..."
+  },
+  "trigger": {
+    "x402_version": "2025-q2",
+    "payment_id": "0x...",
+    "hash": "0x..."
+  },
+  "escrow": {
+    "escrow_id": 0,
+    "payer": "0x...",
+    "agent": "0x...",
+    "amount": "0.05",
+    "status": "settled"
+  },
+  "proof": {
+    "proof_hash": "0x...",
+    "uri": "walrus://..."
+  },
+  "tx": {
+    "create_tx": "0x...",
+    "proof_tx": "0x...",
+    "settle_tx": "0x..."
+  },
+  "chain": {
+    "name": "hardhat-local",
+    "chain_id": 31337
+  }
+}
+```
+
+---
+
+## 🔧 Troubleshooting
+
+### Demo script hangs or fails
+
+1. **Check Hardhat node:**
+   ```bash
+   curl http://127.0.0.1:8545
+   ```
+
+2. **Check agent logs:**
+   ```bash
+   tail -f /tmp/wap3_agent.log
+   ```
+
+3. **Check compile logs:**
+   ```bash
+   cat /tmp/wap3_compile.log
+   ```
+
+### Port 8545 already in use
+
+```bash
+# Find and kill process
+lsof -ti:8545 | xargs kill -9
+```
+
+### Clean output files
+
+```bash
+rm -rf demo/out/*
+```
+
+---
+
+## 🎥 Recording a Video Demo
+
+For grant applications or presentations:
+
+1. Use OBS Studio or similar screen recording software
+2. Run `./demo/run_mvp_demo.sh`
+3. Capture the terminal output
+4. Target 45-60 seconds length
+5. Highlight key MVP outputs
+
+**Key points to emphasize:**
+- "This agent is completely autonomous"
+- "No human intervention after buyer creates task"
+- "Payment happens automatically once work is verified"
+- "This enables a new economy for AI agents"
+
+---
+
+## 🏗️ Architecture
 
 ```
 ┌─────────────────┐                    ┌─────────────────┐
@@ -38,219 +252,22 @@ Unlike traditional smart contract demos that just show wallet interactions, this
          │                        10. Ready for next task
 ```
 
-## Running the Demo
+---
 
-### Prerequisites
-
-- Node.js 18+
-- Two terminal windows
-- Local Hardhat network OR public testnet
-
-### Step 1: Start the Agent Service
-
-**Terminal 1:**
-
-```bash
-npx hardhat run demo/agent-service.ts --network localhost
-```
-
-This will:
-- Deploy the AgentEscrow contract
-- Start listening for tasks
-- Display contract address and agent address
-
-**Keep this terminal open!** The agent runs continuously.
-
-### Step 2: Create a Task (Buyer Side)
-
-**Terminal 2:**
-
-```bash
-npx hardhat run demo/buyer-client.ts --network localhost
-```
-
-When prompted:
-1. Enter the **contract address** from Terminal 1
-2. Enter the **agent address** from Terminal 1
-
-Then watch the magic happen! 🎉
-
-### Expected Output
-
-**Terminal 1 (Agent):**
-```
-🤖 WAP3 AUTONOMOUS AGENT SERVICE 🤖
-✓ Contract deployed at: 0x5FbDB...
-🤖 Agent address: 0x3C44C...
-💰 Agent balance: 10000.0 ETH
-
-👂 Agent is now listening for tasks on-chain...
-⏳ Waiting for buyers to create escrows...
-
-═══════════════════════════════════════════════════════
-🔔 NEW TASK DETECTED!
-═══════════════════════════════════════════════════════
-
-📋 Escrow ID: 0
-👤 Payer: 0x70997...
-💵 Payment: 0.05 ETH
-🎯 Task ID: 0x1a2b3c...
-
-📝 Task: "Analyze sentiment: 'WAP3 enables autonomous AI agents...'"
-
-🧠 Analyzing task with AI model...
-✓ AI analysis complete!
-{
-  "task": "...",
-  "sentiment": "POSITIVE",
-  "confidence": "92.3%",
-  "timestamp": "2024-12-05T10:30:45.123Z",
-  "model": "sentiment-analyzer-v1.0"
-}
-
-📦 Uploading result to IPFS...
-✓ IPFS Hash: QmXx...abc123
-
-📤 Submitting proof to blockchain...
-✓ Proof submitted successfully!
-
-⏳ Waiting for payer to verify and release payment...
-
-═══════════════════════════════════════════════════════
-💰 PAYMENT RECEIVED!
-═══════════════════════════════════════════════════════
-
-✓ Escrow ID: 0
-💵 Amount: 0.05 ETH
-💰 New balance: 10000.05 ETH
-
-✓ Task completed successfully! Ready for next task...
-```
-
-**Terminal 2 (Buyer):**
-```
-👤 WAP3 BUYER CLIENT 👤
-
-Enter contract address: 0x5FbDB...
-Enter agent address: 0x3C44C...
-
-🔗 Connecting to AgentEscrow contract...
-
-👤 Your address: 0x70997...
-💰 Your balance: 10000.0 ETH
-
-📝 Creating new task for AI agent...
-
-🎯 Task: sentiment-analysis-blockchain-text
-💵 Payment: 0.05 ETH
-🤖 Agent: 0x3C44C...
-
-📤 Creating escrow on-chain...
-
-✓ Escrow created successfully!
-🆔 Escrow ID: 0
-🔗 Transaction: 0xabc123...
-
-⏳ Waiting for agent to complete task...
-
-═══════════════════════════════════════════════════════
-✓ PROOF RECEIVED FROM AGENT!
-═══════════════════════════════════════════════════════
-
-🔗 Proof Hash: 0xdef456...
-🔍 Verifying proof off-chain...
-✓ Proof verified! Work completed successfully.
-
-💰 Releasing payment to agent...
-
-✓ Payment released successfully!
-💵 Your new balance: 9999.949... ETH
-
-═══════════════════════════════════════════════════════
-🎉 TRANSACTION COMPLETE!
-═══════════════════════════════════════════════════════
-
-✓ Task completed and agent paid autonomously
-✓ No intermediaries, no manual approval
-✓ Fully on-chain settlement with cryptographic proof
-```
-
-## What This Proves
-
-### For Reviewers / Grant Evaluators:
-
-1. **Real Automation** — The agent operates autonomously, no human clicks "execute"
-2. **AI Integration** — Shows how AI agents can be integrated with blockchain payments
-3. **Decentralized Storage** — Demonstrates off-chain storage with on-chain verification
-4. **Instant Settlement** — Payment happens automatically once proof is verified
-5. **Scalability** — One agent can handle multiple tasks from multiple buyers
-
-### For Developers:
-
-1. **Event-Driven Architecture** — Agent listens to on-chain events
-2. **Async Workflow** — Real-world async task execution pattern
-3. **Proof-Based Verification** — Cryptographic proof instead of trust
-4. **Gas Efficiency** — Minimal on-chain operations, complex work off-chain
-
-### For Business Partners:
-
-1. **New Business Model** — Enables pay-per-task AI services
-2. **Trustless** — No need to trust the agent or the buyer
-3. **Transparent** — All transactions verifiable on-chain
-4. **Composable** — Can integrate with any EVM chain
-
-## Next Steps
+## 📚 Next Steps
 
 After running the demo:
 
-1. **Try multiple tasks** — Keep Terminal 1 running, run Terminal 2 multiple times
-2. **Modify the task** — Edit `buyer-client.ts` to change task description
-3. **Simulate failures** — Comment out the `releasePayment()` call to test refunds
-4. **Deploy to testnet** — Run on Sepolia or other public testnet
-
-## Recording a Video Demo
-
-For grant applications, record both terminals side-by-side:
-
-1. Use OBS Studio or similar screen recording software
-2. Split screen to show both terminals
-3. Add voiceover explaining what's happening
-4. Target 2-3 minutes length
-5. Upload to YouTube or Loom
-
-**Key points to emphasize in video:**
-- "This agent is completely autonomous"
-- "No human intervention after buyer creates task"
-- "Payment happens automatically once work is verified"
-- "This enables a new economy for AI agents"
-
-## Architecture Notes
-
-This demo simulates:
-- **AI Processing** — In production, would call OpenAI, Anthropic, or custom models
-- **IPFS Storage** — In production, would use real Walrus or IPFS
-- **Instant Verification** — In production, might use oracles or more complex verification
-
-The smart contract is production-ready. The off-chain components are simplified for demo purposes.
-
-## Troubleshooting
-
-**Agent not detecting tasks:**
-- Make sure you're using the correct contract address
-- Check that both scripts are on the same network (localhost)
-
-**Buyer client hangs:**
-- Make sure agent service is running first
-- Check that you entered the correct addresses
-
-**Want to reset:**
-- Stop both terminals (Ctrl+C)
-- Restart agent service first, then buyer client
-
-## Feedback
-
-This demo is designed to impress reviewers while being technically accurate. If you have suggestions for improvement, please open an issue!
+1. **Try multiple tasks** - Keep agent running, run buyer multiple times
+2. **Modify the task** - Edit `buyer-client.ts` to change task description
+3. **Simulate failures** - Comment out `releasePayment()` to test refunds
+4. **Deploy to testnet** - Run on Sepolia or other public testnet
+5. **Explore adapters** - Check `adapters/` for framework integration examples
 
 ---
 
-**[← Back to Technical Documentation](../TECHNICAL.md)**
+## 🔗 Related Documentation
+
+- **[Main README](../README.md)** - Project overview
+- **[Technical Docs](../TECHNICAL.md)** - Smart contract API
+- **[Adapters](../adapters/)** - Framework integration examples

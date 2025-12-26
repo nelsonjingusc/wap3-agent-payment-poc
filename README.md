@@ -1,245 +1,250 @@
-# GioroX AI, Inc.
+# WAP3 - Web3 Agent Payment & Provenance Platform
 
-**Building the programmable financial layer for the Agent Economy.**
-
----
-
-## About Us
-
-**GioroX AI** builds programmable settlement and escrow protocols that enable autonomous AI agents to transact, verify, and collaborate securely across Web3 ecosystems.
-
-We're creating the infrastructure that allows AI agents to autonomously execute economic transactions without human intervention—enabling a new paradigm where agents can discover work, complete tasks, prove execution, and settle payments entirely on-chain.
+**Programmable escrow and settlement infrastructure for autonomous AI agents.**
 
 ---
 
-## Our Vision
+## 🚀 Quick Start - Run the Demo
 
-The future of AI is autonomous, and autonomy requires economic independence.
+**One command to see it in action:**
 
-Traditional payment systems (Stripe, PayPal, bank transafers) were designed for humans and fail to meet the requirements of AI-to-AI commerce:
+```bash
+./demo/run_mvp_demo.sh
+```
 
-- ❌ Too slow (days vs. milliseconds)
-- ❌ Too expensive for micro-transactions ($0.30 + 2.9% per transaction)
-- ❌ Require human authentication
-- ❌ No cryptographic proof of work completion
-- ❌ Centralized intermediaries
-
-**GioroX AI provides:**
-
-- ✅ **Programmable escrow** on-chain with smart contract automation
-- ✅ **Proof-based verification** via decentralized storage (Walrus, IPFS)
-- ✅ **Sub-second settlement** with micro-payment support
-- ✅ **Multi-chain support** across EVM, Move, and other ecosystems
-- ✅ **Full provenance** with immutable on-chain audit trails
-- ✅ **Zero intermediaries** with trustless, cryptographic guarantees
-
----
-
-## Current Status
-
-| Status | Details |
-|--------|---------|
-| **Incorporated** | Delaware, October 2025 |
-| **Active Development** | EVM-compatible escrow protocols (see [Technical Documentation](TECHNICAL.md)) |
-| **Stage** | Early-stage R&D, building foundational infrastructure |
-
----
-
-## What We're Building
-
-### WAP3 — Web3 Agent Payment & Provenance Platform
-
-WAP3 is a comprehensive infrastructure layer that enables:
-
-1. **Agent Marketplaces** — AI agents discover and bid on tasks autonomously
-2. **Verifiable Execution** — Cryptographic proofs stored on decentralized networks
-3. **Automated Settlement** — Smart contracts release payments when conditions are met
-4. **Cross-Chain Payments** — Seamless transactions across different blockchain ecosystems
-
-### This Repository: Agent Payment & Escrow PoC
-
-This repository contains our first public proof-of-concept: a minimal escrow contract for AI agent payments on EVM chains.
+**Expected output:**
+```
+MVP:AP2_INTENT_ID=0x...
+MVP:X402_PAYMENT_ID=0x...
+MVP:ESCROW_ID=0
+MVP:PROOF_HASH=0x...
+MVP:SETTLE_TX=0x...
+MVP:AUDIT_JSON=demo/out/session_*/audit.json
+```
 
 **What it demonstrates:**
-- 🔒 Escrow creation and funding by a task buyer
-- 🤖 Task completion and proof submission by an AI agent
-- ✅ Off-chain verification via proof hash
-- 💰 Automatic payment settlement on-chain
+- ✅ AP2 Intent creation (Google AP2, 2025 Q3)
+- ✅ X402 Payment trigger (Coinbase X402, 2025 Q2)
+- ✅ On-chain escrow creation
+- ✅ Autonomous agent task execution
+- ✅ Proof submission and verification
+- ✅ Automatic payment settlement
+- ✅ Complete audit trail export
 
-**Quick stats:**
-- ✅ 18 comprehensive tests (100% passing)
-- ✅ Full TypeScript support with auto-generated types
-- ✅ Gas-optimized contracts (~100k gas for escrow creation)
-- ✅ Chain-agnostic (works on any EVM network)
-- ✅ **Live autonomous agent demo** (see below)
-
-### 🎬 Try the Autonomous Agent Demo
-
-Experience the future of AI agent payments with our **interactive two-terminal demo**:
-
-**Terminal 1 (Agent):** Autonomous AI agent that listens for tasks, executes work, and submits proof
-**Terminal 2 (Buyer):** Create tasks and watch agents complete them automatically
-
-```bash
-# Terminal 1: Start the autonomous agent
-npm run demo:agent
-
-# Terminal 2: Create a task (after agent is running)
-npm run demo:buyer
-```
-
-Watch as the agent:
-- 🔔 Detects new tasks on-chain
-- 🧠 Executes AI work (simulated sentiment analysis)
-- 📦 Uploads results to IPFS (simulated)
-- ✅ Submits cryptographic proof
-- 💰 Receives payment automatically
-
-**[Full Demo Guide](demo/README.md)** • **[Video Tutorial](#)** (coming soon)
+**Note:** Demo defaults to skip compilation for reliability and will automatically compile if supported by your environment.
 
 ---
 
-## ⚡ Quick Start
+## 📖 Documentation
 
-Want to see autonomous AI agents in action? Run our interactive demo:
+- **[Demo Guide](demo/README.md)** - Detailed demo instructions and architecture
+- **[Technical Documentation](TECHNICAL.md)** - Smart contract API and design
+- **[Adapters](adapters/)** - Framework integration examples (LangGraph, Tool-Agent)
+
+---
+
+## 🎯 What is WAP3?
+
+WAP3 enables autonomous AI agents to transact, verify, and collaborate securely across Web3 ecosystems without human intervention.
+
+### Key Features
+
+- **Programmable Escrow** - On-chain escrow with smart contract automation
+- **Proof-Based Verification** - Cryptographic proofs stored on decentralized storage (Walrus, IPFS)
+- **Sub-Second Settlement** - Micro-payment support with instant verification
+- **Multi-Chain Support** - Works on any EVM-compatible chain
+- **Full Provenance** - Immutable on-chain audit trails
+- **Zero Intermediaries** - Trustless, cryptographic guarantees
+
+### Use Cases
+
+1. **Agent Marketplaces** - AI agents discover and bid on tasks autonomously
+2. **Verifiable Execution** - Cryptographic proofs stored on decentralized networks
+3. **Automated Settlement** - Smart contracts release payments when conditions are met
+4. **Cross-Chain Payments** - Seamless transactions across different blockchain ecosystems
+
+---
+
+## 🏗️ Architecture
+
+### Core Components
+
+- **Smart Contract** (`contracts/AgentEscrow.sol`) - On-chain escrow and settlement
+- **Protocol Layer** (`src/protocol/`) - AP2 Intent and X402 Trigger schemas
+- **WAP3 SDK** (`src/wap3/`) - Client library for escrow operations
+- **Adapters** (`adapters/`) - Framework integration examples
+
+### Transaction Lifecycle
+
+```
+1. Intent Creation (AP2)
+   └─> Buyer creates task intent
+   
+2. Payment Trigger (X402)
+   └─> Payment conditions defined
+   
+3. Escrow Creation
+   └─> Funds locked on-chain
+   
+4. Task Execution
+   └─> Agent executes work
+   
+5. Proof Submission
+   └─> Cryptographic proof stored
+   
+6. Settlement
+   └─> Payment released automatically
+   
+7. Audit
+   └─> Complete transaction record
+```
+
+---
+
+## 📦 Installation
 
 ```bash
-# 1. Clone and install
+# Clone repository
 git clone https://github.com/gioroxai/wap3-agent-payment-poc.git
 cd wap3-agent-payment-poc
-npm install && npm run compile
 
-# 2. Terminal 1: Start autonomous agent
+# Install dependencies
+npm install
+
+# Compile contracts (optional, demo auto-detects)
+npm run compile
+```
+
+---
+
+## 🎬 Demo Modes
+
+### Mode 1: MVP Demo (One-Command, Recommended)
+
+**Perfect for presentations and video demos:**
+
+```bash
+./demo/run_mvp_demo.sh
+```
+
+**Features:**
+- One-command execution
+- Non-interactive
+- Stable output with MVP: prefixes
+- Complete audit JSON generation
+
+### Mode 2: Dual-Agent Demo (LangGraph Integration)
+
+**Showcases multi-agent collaboration:**
+
+```bash
+npm run demo:dual-agent
+```
+
+**Features:**
+- Two agents collaborating (Buyer Agent + Service Agent)
+- LangGraph workflow orchestration
+- Framework integration demonstration
+
+### Mode 3: Manual Two-Terminal Demo
+
+**For interactive testing:**
+
+```bash
+# Terminal 1: Start agent service
 npm run demo:agent
 
-# 3. Terminal 2: Create a task (copy addresses from Terminal 1)
+# Terminal 2: Create task
 npm run demo:buyer
 ```
 
-Watch as the agent automatically detects tasks, executes AI work, and receives payment. **Total time: ~10 seconds**
-
-📖 **[Full Demo Guide](demo/README.md)** • 🧪 **Run tests:** `npm test` • 📚 **[Technical Docs](TECHNICAL.md)**
+See [demo/README.md](demo/README.md) for detailed instructions.
 
 ---
 
-## Use Cases
+## 🧪 Testing
 
-Our infrastructure enables a new class of autonomous agent applications:
+```bash
+# Run test suite
+npm test
 
-### 1. **Content Analysis & Monitoring**
-AI agents analyze sentiment, extract insights, or monitor social media—receiving automatic payment upon proof of completion.
+# Run with coverage
+npm run test:coverage
 
-### 2. **Data Processing Services**
-Agents scrape, clean, and structure data from various sources. Payment is held in escrow until verified results are delivered.
+# Run with gas reporting
+npm run test:gas
+```
 
-### 3. **GPU-Intensive Compute**
-Image classification, video transcription, model training—agents with compute resources complete tasks and receive metered payments.
-
-### 4. **Blockchain Monitoring & Alerting**
-Agents monitor on-chain events and submit periodic reports, triggering micro-payments for each verified submission.
-
-### 5. **Multi-Agent Collaboration**
-Complex tasks split across multiple specialized agents, with payment distribution based on verified contributions.
+**Test Results:** 18/18 passing ✅
 
 ---
 
-## Roadmap
+## 📚 Project Structure
 
-### ✅ Phase 1: Foundation (Current)
-- [x] EVM escrow contract implementation
-- [x] Comprehensive test suite
-- [x] TypeScript SDK and examples
-- [x] Technical documentation
-
-### 🚧 Phase 2: Decentralized Storage Integration (Q1 2026)
-- [ ] Walrus storage integration for proof verification
-- [ ] IPFS support for task specifications and results
-- [ ] Automated proof validation via oracles
-
-### 🔮 Phase 3: Multi-Chain & Protocol Integration (Q2 2026)
-- [ ] Move-based contracts on Sui
-- [ ] AP2/X402 agent protocol adapters
-- [ ] Multi-token support (USDC, USDT, stablecoins)
-- [ ] Cross-chain payment rails
-
-### 🚀 Phase 4: Production Infrastructure (Q3 2026)
-- [ ] Agent marketplace frontend
-- [ ] Reputation and dispute resolution system
-- [ ] Security audit and formal verification
-- [ ] Mainnet deployment
-- [ ] GPU network integration (Aethir, etc.)
+```
+wap3-agent-payment-poc/
+├── contracts/          # Solidity smart contracts
+├── src/                # TypeScript SDK and utilities
+│   ├── protocol/       # AP2 Intent + X402 Trigger schemas
+│   ├── wap3/          # WAP3 client library
+│   └── utils/         # Chain config and utilities
+├── demo/              # Demo scripts and examples
+│   ├── run_mvp_demo.sh        # One-command MVP demo
+│   ├── run_dual_agent_demo.sh # Dual-agent demo
+│   ├── agent-service.ts       # Service agent
+│   ├── buyer-client.ts        # Buyer client
+│   └── buyer-agent-langgraph.ts # LangGraph buyer agent
+├── adapters/          # Framework integration examples
+│   ├── langgraphjs/   # LangGraph adapter
+│   └── tool_agent/    # Tool-agent adapter
+├── test/              # Test suite
+└── examples/          # Usage examples
+```
 
 ---
 
-## Technology Stack
+## 🔗 Chain Support
 
-**Current (EVM PoC):**
-- Solidity 0.8.20
-- Hardhat development environment
-- TypeScript + ethers.js v6
-- Comprehensive Mocha/Chai test suite
+**Default:** Hardhat Local (Chain ID: 31337)
 
-**Future:**
-- Move language for Sui integration
-- Walrus for decentralized storage
-- Chainlink oracles for automated verification
-- Layer 2 solutions for gas optimization
+**Also Supports:**
+- Sepolia Testnet (Chain ID: 11155111)
+- Any EVM-compatible chain (via `hardhat.config.ts`)
+
+The protocol is **chain-agnostic** - core intent/trigger/audit layers work across all chains.
 
 ---
 
-## Get Involved
+## 🔧 Development
 
-We're in active development and welcome collaboration from:
+```bash
+# Start local Hardhat node
+npm run node
 
-- 🏢 **Partners & Integrators** — GPU providers, storage networks, agent frameworks
-- 💼 **Investors** — Building the future of autonomous agent economies
-- 👨‍💻 **Developers** — Contribute to our open-source infrastructure
-- 🔬 **Researchers** — Explore agent economics and verification mechanisms
+# Deploy contract
+npm run deploy:localhost
 
----
-
-## Contact
-
-**GioroX AI, Inc.**
-
-- 📧 **Email**: nelsonjing@gioroxai.com, nelson.jingusc@gmail.com
-- 💬 **Telegram**: [@nelsonjingusc](https://t.me/nelsonjingusc)
-
-**Founder**: Nan (Nelson) Jing
-
-For partnership inquiries, investment opportunities, or technical collaboration, please reach out via email or Telegram.
+# Run specific demo
+npm run demo:agent
+npm run demo:buyer
+npm run demo:buyer-agent
+npm run demo:dual-agent
+```
 
 ---
 
-## Quick Links
+## 📄 License
 
-- 🎬 **[Autonomous Agent Demo](demo/README.md)** — Interactive demo showing real agent automation
-- 📖 **[Technical Documentation](TECHNICAL.md)** — Full implementation guide, API reference, and quick start
-- 📝 **[Smart Contract](contracts/AgentEscrow.sol)** — Escrow contract source code
-- 🧪 **[Test Suite](test/AgentEscrow.test.ts)** — Comprehensive test coverage
-- 💡 **[Examples](examples/)** — Usage examples and patterns
-- 📄 **[License](LICENSE)** — MIT License
+MIT License - see [LICENSE](LICENSE) file
 
 ---
 
-## Acknowledgments
+## 👥 About
 
-This project builds on the broader vision of autonomous AI agent economies. We're inspired by and grateful to:
+**GioroX AI, Inc.** - Building the programmable financial layer for the Agent Economy.
 
-- The Web3 ecosystem's commitment to decentralization and transparency
-- Press Start Capital, Sui Foundation, and Walrus for fellowship support
-- The emerging AP2/X402 agent protocol standards community
-- The broader AI agent research and development community
-- All open-source contributors to the Ethereum and Move ecosystems
+For more information, visit our [Technical Documentation](TECHNICAL.md).
 
 ---
-
-<div align="center">
 
 **Built with ❤️ by GioroX AI, Inc.**
-
-_Enabling the autonomous agent economy, one transaction at a time._
-
-[Website](https://www.gioroxai.com) • [Technical Docs](TECHNICAL.md) • [Contact](mailto:nelsonjing@gioroxai.com)
-
-</div>
