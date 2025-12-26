@@ -47,3 +47,7 @@ demo/out/
 # OS junk
 __MACOSX/
 .DS_Store
+
+# Temporary commit planning files
+COMMIT_COMMANDS.sh
+COMMIT_PLAN.md
