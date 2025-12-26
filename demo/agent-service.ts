@@ -1,5 +1,14 @@
 import { ethers } from "hardhat";
-import * as readline from "readline";
+import * as fs from "fs";
+import * as path from "path";
+import {
+  printMVPInfo,
+  printEscrowPicked,
+  printProofHash,
+  printProofTx,
+  printSettleTx,
+  printStatus,
+} from "../src/wap3/printer";
 
 /**
  * Autonomous Agent Service
@@ -77,7 +86,30 @@ async function main() {
   await escrow.waitForDeployment();
 
   const escrowAddress = await escrow.getAddress();
+  const rpcUrl = (ethers.provider as any).connection?.url || "http://127.0.0.1:8545";
+
+  // Print MVP_INFO (machine-readable, must be first)
+  printMVPInfo(escrowAddress, agent.address, rpcUrl);
+
+  // Write runtime file for buyer/audit scripts
+  const outDir = path.join(__dirname, "out");
+  if (!fs.existsSync(outDir)) {
+    fs.mkdirSync(outDir, { recursive: true });
+  }
+  
+  const runtimeFile = path.join(outDir, "mvp_runtime.json");
+  fs.writeFileSync(
+    runtimeFile,
+    JSON.stringify({
+      contract: escrowAddress,
+      agent: agent.address,
+      rpc: rpcUrl,
+      timestamp: new Date().toISOString(),
+    }, null, 2)
+  );
+
   log("✓", `Contract deployed at: ${escrowAddress}`, colors.green);
+  log("📝", `Runtime file written: ${runtimeFile}`, colors.cyan);
   console.log();
 
   log("🤖", `Agent address: ${agent.address}`, colors.cyan);
@@ -91,10 +123,46 @@ async function main() {
   console.log(`${colors.yellow}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${colors.reset}`);
   console.log();
 
-  escrow.on("EscrowCreated", async (escrowId, payerAddress, agentAddress, amount, taskId) => {
+  escrow.on(escrow.filters.EscrowCreated(), async (...args: any[]) => {
+    // In ethers v6 with typechain, event args are passed as an array
+    // EscrowCreated: [escrowId, payer, agent, amount, taskId]
+    // Handle both direct args and event log object
+    let escrowId: bigint;
+    let payerAddress: string;
+    let agentAddress: string;
+    let amount: bigint;
+    let taskId: string;
+    
+    // Check if first arg is an event log object (has args property)
+    if (args.length === 1 && args[0] && typeof args[0] === 'object' && 'args' in args[0]) {
+      const eventLog = args[0] as any;
+      const eventArgs = eventLog.args;
+      // Try object access first, then array access
+      escrowId = eventArgs.escrowId ?? eventArgs[0];
+      payerAddress = eventArgs.payer ?? eventArgs[1];
+      agentAddress = eventArgs.agent ?? eventArgs[2];
+      amount = eventArgs.amount ?? eventArgs[3];
+      taskId = eventArgs.taskId ?? eventArgs[4];
+    } else {
+      // Direct args: [escrowId, payer, agent, amount, taskId]
+      escrowId = args[0];
+      payerAddress = args[1];
+      agentAddress = args[2];
+      amount = args[3];
+      taskId = args[4];
+    }
+    
+    // Safety check: ensure agentAddress exists and matches
+    if (!agentAddress || typeof agentAddress !== 'string') {
+      return;
+    }
+    
     if (agentAddress.toLowerCase() !== agent.address.toLowerCase()) {
       return;
     }
+
+    // Print MVP:ESCROW_PICKED
+    printEscrowPicked(escrowId);
 
     console.log();
     console.log(`${colors.green}${"═".repeat(55)}${colors.reset}`);
@@ -123,10 +191,19 @@ async function main() {
       console.log();
 
       const proofHash = ethers.keccak256(ethers.toUtf8Bytes(ipfsHash));
+      
+      // Print MVP:PROOF_HASH
+      printProofHash(proofHash);
+
       log("📤", "Submitting proof to blockchain...", colors.yellow);
 
       const txProof = await escrow.connect(agent).submitProof(escrowId, proofHash);
-      await txProof.wait();
+      const receiptProof = await txProof.wait();
+
+      // Print MVP:PROOF_TX
+      if (receiptProof) {
+        printProofTx(receiptProof.hash);
+      }
 
       log("✓", "Proof submitted successfully!", colors.green);
       log("🔗", `Proof Hash: ${proofHash.slice(0, 20)}...`, colors.cyan);
@@ -139,10 +216,44 @@ async function main() {
     }
   });
 
-  escrow.on("PaymentReleased", async (escrowId, payerAddress, agentAddress, amount) => {
+  escrow.on(escrow.filters.PaymentReleased(), async (...args: any[]) => {
+    // In ethers v6 with typechain, event args are passed as an array
+    // PaymentReleased: [escrowId, payer, agent, amount]
+    // Handle both direct args and event log object
+    let escrowId: bigint;
+    let payerAddress: string;
+    let agentAddress: string;
+    let amount: bigint;
+
+    if (args.length > 0 && typeof args[0] === 'object' && args[0].args) {
+      // Event log object format
+      const event = args[0];
+      escrowId = event.args[0];
+      payerAddress = event.args[1];
+      agentAddress = event.args[2];
+      amount = event.args[3];
+    } else {
+      // Direct args format
+      escrowId = args[0];
+      payerAddress = args[1];
+      agentAddress = args[2];
+      amount = args[3];
+    }
+
+    // Safety check: ensure agentAddress exists and matches
+    if (!agentAddress || typeof agentAddress !== 'string') {
+      return;
+    }
+    
     if (agentAddress.toLowerCase() !== agent.address.toLowerCase()) {
       return;
     }
+
+    // Print MVP:SETTLE_TX and MVP:STATUS
+    // Note: We need to get the tx hash from the event, but events don't include it
+    // So we'll query the latest transaction or use a placeholder
+    printSettleTx("pending"); // Will be updated by buyer-client or audit script
+    printStatus("settled");
 
     console.log();
     console.log(`${colors.green}${"═".repeat(55)}${colors.reset}`);
