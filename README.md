@@ -45,9 +45,13 @@ MVP:AUDIT_JSON=demo/out/session_*/audit.json
 
 ## About Us
 
-**GioroX AI, Inc.** builds programmable settlement and escrow protocols that enable autonomous AI agents to transact, verify, and collaborate securely across Web3 ecosystems.
+### **GIOROX AI, INC.**
 
-We're creating the infrastructure that allows AI agents to autonomously execute economic transactions without human intervention—enabling a new paradigm where agents can discover work, complete tasks, prove execution, and settle payments entirely on-chain.
+**Building the programmable financial layer for the Agent Economy.**
+
+GioroX AI, Inc. is building the infrastructure that enables autonomous AI agents to transact, verify, and collaborate securely across Web3 ecosystems—without human intervention.
+
+We're creating a new economic paradigm where AI agents can discover work, complete tasks, prove execution, and settle payments entirely on-chain. Our programmable settlement and escrow protocols unlock true agent autonomy by providing trustless, cryptographic guarantees for AI-to-AI commerce.
 
 ---
 
