@@ -1,6 +1,6 @@
-# WAP3 - Web3 Agent Payment & Provenance Platform
+# GioroX AI, Inc.
 
-**Programmable escrow and settlement infrastructure for autonomous AI agents.**
+**Building the programmable financial layer for the Agent Economy.**
 
 ---
 
@@ -45,7 +45,7 @@ MVP:AUDIT_JSON=demo/out/session_*/audit.json
 
 ## About Us
 
-**GioroX AI** builds programmable settlement and escrow protocols that enable autonomous AI agents to transact, verify, and collaborate securely across Web3 ecosystems.
+**GioroX AI, Inc.** builds programmable settlement and escrow protocols that enable autonomous AI agents to transact, verify, and collaborate securely across Web3 ecosystems.
 
 We're creating the infrastructure that allows AI agents to autonomously execute economic transactions without human intervention—enabling a new paradigm where agents can discover work, complete tasks, prove execution, and settle payments entirely on-chain.
 
@@ -74,7 +74,19 @@ Traditional payment systems (Stripe, PayPal, bank transfers) were designed for h
 
 ---
 
-## 🎯 What is WAP3?
+## Current Status
+
+| Status | Details |
+|--------|---------|
+| **Incorporated** | Delaware, October 2025 |
+| **Active Development** | EVM-compatible escrow protocols (see [Technical Documentation](TECHNICAL.md)) |
+| **Stage** | Early-stage R&D, building foundational infrastructure |
+
+---
+
+## What We're Building
+
+### WAP3 — Web3 Agent Payment & Provenance Platform
 
 WAP3 enables autonomous AI agents to transact, verify, and collaborate securely across Web3 ecosystems without human intervention.
 
