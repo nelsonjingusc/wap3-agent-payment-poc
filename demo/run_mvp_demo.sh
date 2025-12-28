@@ -6,6 +6,9 @@
 
 set -e
 
+# Opening caption for demo
+echo "WAP3 MVP Demo: Agent Escrow → Proof → Settlement → Audit"
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
@@ -196,35 +199,38 @@ export SETTLE_OUTPUT
 
 # Step 6: Run audit script (reads from mvp_runtime.json and finds latest session)
 # IMPORTANT: Audit must complete before cleanup
-# Temporarily disable set -e for audit (we handle errors manually)
-set +e
 echo -e "${YELLOW}[6/7] Generating audit record...${NC}"
-AUDIT_OUTPUT=$(ESCROW_ID=$ESCROW_ID SESSION_DIR="$SESSION_DIR" npx hardhat run $HARDHAT_RUN_EXTRA demo/audit.ts --network localhost 2>&1)
-AUDIT_EXIT_CODE=$?
-set -e
 
-# Extract audit file path (prefer session directory, fallback to out/)
+# Create out directory if it doesn't exist
+mkdir -p demo/out
+
+# Run audit and redirect stderr to log file to avoid stack traces in terminal
+AUDIT_ERROR_LOG="demo/out/audit_error.log"
+AUDIT_OUTPUT=$(ESCROW_ID=$ESCROW_ID SESSION_DIR="$SESSION_DIR" npx hardhat run $HARDHAT_RUN_EXTRA demo/audit.ts --network localhost 2>"$AUDIT_ERROR_LOG")
+AUDIT_EXIT_CODE=$?
+
+# Extract audit file path from MVP:AUDIT_JSON= output
 AUDIT_FILE=$(echo "$AUDIT_OUTPUT" | grep "MVP:AUDIT_JSON=" | head -1 | sed -n 's/.*AUDIT_JSON=\([^ ]*\).*/\1/p')
 
-if [ -z "$AUDIT_FILE" ]; then
-    # Try to find audit in session directory first
-    if [ -n "$SESSION_DIR" ] && [ -f "$SESSION_DIR/audit.json" ]; then
-        AUDIT_FILE="$SESSION_DIR/audit.json"
-    else
-        # Fallback to out/ directory
-        AUDIT_FILE="demo/out/audit_${ESCROW_ID}.json"
-    fi
-    echo -e "${YELLOW}Warning: Audit file path not found in output, using: $AUDIT_FILE${NC}"
-fi
-
-if [ $AUDIT_EXIT_CODE -eq 0 ] && [ -f "$AUDIT_FILE" ]; then
+if [ $AUDIT_EXIT_CODE -eq 0 ] && [ -n "$AUDIT_FILE" ] && [ -f "$AUDIT_FILE" ]; then
     echo -e "${GREEN}✓ Audit record generated: $AUDIT_FILE${NC}"
+    # Print the MVP:AUDIT_JSON line for machine parsing
+    echo "$AUDIT_OUTPUT" | grep "MVP:AUDIT_JSON=" || true
 else
-    echo -e "${YELLOW}⚠ Audit may have failed or file not found${NC}"
-    echo "$AUDIT_OUTPUT" | tail -10
+    # Audit failed - show clean error message
+    echo -e "${RED}⚠ Audit failed. See $AUDIT_ERROR_LOG${NC}"
+    # Show first few lines of error log if it exists and has content
+    if [ -f "$AUDIT_ERROR_LOG" ] && [ -s "$AUDIT_ERROR_LOG" ]; then
+        echo "Error summary:"
+        head -3 "$AUDIT_ERROR_LOG" | sed 's/^/  /'
+    fi
+    echo ""
+    echo -e "${RED}Demo failed at audit stage. Exiting.${NC}"
+    exit 1
 fi
 
 # Step 7: Print summary
+echo -e "${YELLOW}[7/7] Generating summary...${NC}"
 echo ""
 echo -e "${GREEN}╔════════════════════════════════════════════════════════════╗${NC}"
 echo -e "${GREEN}║                    MVP DEMO COMPLETE                       ║${NC}"
@@ -289,21 +295,25 @@ echo ""
 SUCCESS=1
 
 # Check 1: MVP outputs
+# Expected 6 core outputs: AP2_INTENT_ID, X402_PAYMENT_ID, ESCROW_ID, PROOF_HASH, SETTLE_TX, AUDIT_JSON
 MVP_COUNT=$(echo "$BUYER_OUTPUT" "$AUDIT_OUTPUT" "$SETTLE_OUTPUT" 2>/dev/null | grep -c "MVP:" || echo "0")
 if [ "$MVP_COUNT" -ge 6 ]; then
-    echo -e "${GREEN}✓ MVP outputs: $MVP_COUNT/6 required${NC}"
+    echo -e "${GREEN}✓ MVP outputs: $MVP_COUNT (6 core outputs required)${NC}"
 else
-    echo -e "${RED}✗ MVP outputs: $MVP_COUNT/6 (missing)${NC}"
+    echo -e "${RED}✗ MVP outputs: $MVP_COUNT (6 core outputs required, missing)${NC}"
     SUCCESS=0
 fi
 
 # Check 2: Audit JSON exists and is valid
 if [ -f "$AUDIT_FILE" ]; then
     ESCROW_STATUS=$(cat "$AUDIT_FILE" 2>/dev/null | grep -o '"status"[[:space:]]*:[[:space:]]*"[^"]*"' | grep -o 'settled' || echo "")
-    if [ "$ESCROW_STATUS" = "settled" ]; then
-        echo -e "${GREEN}✓ Audit JSON: exists and escrow status = settled${NC}"
+    ESCROW_ID_IN_AUDIT=$(cat "$AUDIT_FILE" 2>/dev/null | grep -o '"escrow_id"[[:space:]]*:[[:space:]]*[0-9]*' | grep -o '[0-9]*' || echo "")
+    
+    if [ "$ESCROW_STATUS" = "settled" ] && [ "$ESCROW_ID_IN_AUDIT" = "$ESCROW_ID" ]; then
+        echo -e "${GREEN}✓ Audit JSON: exists, escrow status = settled, escrow_id matches${NC}"
     else
-        echo -e "${YELLOW}⚠ Audit JSON: exists but status may not be settled${NC}"
+        echo -e "${YELLOW}⚠ Audit JSON: exists but validation failed${NC}"
+        SUCCESS=0
     fi
 else
     echo -e "${RED}✗ Audit JSON: missing${NC}"
@@ -324,9 +334,10 @@ fi
 echo ""
 if [ "$SUCCESS" -eq 1 ]; then
     echo -e "${GREEN}🎉 DEMO SUCCESSFUL - All checks passed!${NC}"
-    echo -e "${GREEN}   Ready for VC/accelerator presentation${NC}"
+    echo ""
+    echo "Demo complete. See audit output above."
 else
-    echo -e "${RED}⚠ DEMO INCOMPLETE - Some checks failed${NC}"
+    echo -e "${RED}⚠ DEMO PARTIAL SUCCESS - Some checks failed${NC}"
     echo -e "${YELLOW}   Review output above for details${NC}"
 fi
 echo ""

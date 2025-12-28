@@ -17,7 +17,7 @@ import { printAuditJson } from "../src/wap3/printer";
  * 
  * Reads from:
  *   - demo/out/mvp_runtime.json (contract, rpc)
- *   - demo/out/session_*/ (intent.json, trigger.json)
+ *   - demo/out/session_* (intent.json, trigger.json)
  *   - ESCROW_ID environment variable
  */
 
@@ -202,34 +202,25 @@ async function main() {
   
   fs.writeFileSync(outputPath, JSON.stringify(auditRecord, null, 2));
 
-  // Print MVP:AUDIT_JSON
+  // Print MVP:AUDIT_JSON (must be on stdout for script parsing)
+  // This is the critical line that the demo script will parse
   printAuditJson(outputPath);
-
-  console.log(`\nAudit record saved to: ${outputPath}`);
-  console.log(JSON.stringify(auditRecord, null, 2));
 }
 
 main().catch((error) => {
-  // Only print error if it's not a TypeScript compilation warning
-  // (ts-node sometimes emits warnings that don't prevent execution)
+  // Suppress stack traces - only print clean error message to stderr
+  const errorMessage = error instanceof Error ? error.message : String(error);
+  
+  // Check if it's a TypeScript compilation error (diagnosticCodes)
   if (error && typeof error === 'object' && 'diagnosticCodes' in error) {
-    // This is a TypeScript diagnostic, not a runtime error
-    // Try to continue execution if audit.json was already written
-    const sessionDir = process.env.SESSION_DIR || findLatestSessionDir();
-    const auditPath = sessionDir 
-      ? path.join(sessionDir, "audit.json")
-      : path.join(__dirname, "out", `audit_${process.env.ESCROW_ID || 0}.json`);
-    
-    if (fs.existsSync(auditPath)) {
-      // Audit file exists, print it and exit successfully
-      printAuditJson(auditPath);
-      console.log(`\nAudit record found at: ${auditPath}`);
-      process.exit(0);
-    }
+    // TypeScript compilation error - print clean message
+    console.error("Error: TypeScript compilation failed");
+    console.error("Please check your TypeScript configuration and dependencies");
+    process.exit(1);
   }
   
-  // Real error - print and exit
-  console.error("Error generating audit:", error);
-  process.exitCode = 1;
+  // Runtime error - print clean message
+  console.error("Error generating audit:", errorMessage);
+  process.exit(1);
 });
 
