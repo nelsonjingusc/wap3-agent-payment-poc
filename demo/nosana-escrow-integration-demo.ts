@@ -84,7 +84,6 @@ async function main() {
   console.log();
 
   // Step 5: Generate proof hash from execution result
-  // In production, this would be stored off-chain (e.g., Walrus/IPFS) and only the hash is stored on-chain
   const proofData = {
     executionId: receipt.executionId,
     providerJobId: result.providerJobId,

@@ -14,7 +14,6 @@ async function main() {
 
   console.log("ExecutionResult:", result);
 
-  // settlement hook (placeholder)
   if (result.status === "SUCCEEDED") {
     console.log("[settlement] would trigger escrow release here");
   } else {

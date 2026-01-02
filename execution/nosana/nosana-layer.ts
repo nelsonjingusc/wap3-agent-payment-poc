@@ -11,7 +11,7 @@ export class NosanaExecutionLayer implements ExecutionLayer {
   private useRealApi: boolean;
   private apiKey?: string;
   private market?: string;
-  private nosanaClient: any; // @nosana/kit client (lazy loaded)
+  private nosanaClient: any;
 
   constructor() {
     this.useRealApi = process.env.USE_NOSANA_REAL === "true";
@@ -34,10 +34,7 @@ export class NosanaExecutionLayer implements ExecutionLayer {
     if (this.nosanaClient) return this.nosanaClient;
 
     try {
-      // Dynamic import to avoid breaking if package not installed
       const nosanaKit = await import("@nosana/kit");
-      // Initialize client with API key
-      // Note: Actual API may vary, adjust based on @nosana/kit documentation
       this.nosanaClient = nosanaKit.createClient?.({
         apiKey: this.apiKey,
       }) || nosanaKit;
@@ -61,12 +58,9 @@ export class NosanaExecutionLayer implements ExecutionLayer {
           return this.submitMock(job, executionId, spec);
         }
 
-        // Real Nosana API call
-        // Adjust API call based on actual @nosana/kit API
         const jobResponse = await client.api?.jobs?.create?.({
           market: this.market,
           jobDefinition: spec,
-          // or: jobSpec: spec, depending on actual API
         });
 
         if (!jobResponse || !jobResponse.id) {
@@ -121,14 +115,11 @@ export class NosanaExecutionLayer implements ExecutionLayer {
       try {
         const client = await this.getNosanaClient();
         if (!client) {
-          // Fallback to mock if client failed to load
           return this.waitForCompletionMock(executionId, meta);
         }
 
-        // Poll job status using Nosana API
-        // Adjust polling logic based on actual @nosana/kit API
-        const maxAttempts = 60; // 5 minutes max (5s * 60)
-        const pollInterval = 5000; // 5 seconds
+        const maxAttempts = 60;
+        const pollInterval = 5000;
 
         for (let attempt = 0; attempt < maxAttempts; attempt++) {
           const jobStatus = await client.api?.jobs?.get?.(meta.providerJobId);
@@ -140,7 +131,6 @@ export class NosanaExecutionLayer implements ExecutionLayer {
           const status = jobStatus.status || jobStatus.state;
           
           if (status === "completed" || status === "succeeded") {
-            // Fetch result/output
             const result = jobStatus.result || jobStatus.output || {};
             const logs = jobStatus.logs || "";
 
@@ -157,16 +147,13 @@ export class NosanaExecutionLayer implements ExecutionLayer {
               logs: jobStatus.error || jobStatus.message || "Job failed"
             };
           } else if (status === "running" || status === "pending") {
-            // Continue polling
             await new Promise(r => setTimeout(r, pollInterval));
           } else {
-            // Unknown status
             console.warn(`[nosana] Unknown job status: ${status}, treating as running`);
             await new Promise(r => setTimeout(r, pollInterval));
           }
         }
 
-        // Timeout
         throw new Error(`Job ${meta.providerJobId} did not complete within timeout`);
       } catch (error: any) {
         console.error("[nosana] Real API polling failed, falling back to mock:", error.message);

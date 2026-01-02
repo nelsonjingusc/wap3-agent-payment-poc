@@ -34,7 +34,7 @@ To enable real Nosana API support, install the package:
 npm install @nosana/kit
 ```
 
-**Note**: The actual API structure may differ from the implementation. Adjust the API calls in `nosana-layer.ts` based on the official `@nosana/kit` documentation.
+**Note**: API calls in `nosana-layer.ts` may need adjustment based on the `@nosana/kit` API version.
 
 ## Architecture
 
