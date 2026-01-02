@@ -40,6 +40,7 @@ MVP:AUDIT_JSON=demo/out/session_*/audit.json
 - **[Demo Guide](demo/README.md)** - Detailed demo instructions and architecture
 - **[Technical Documentation](TECHNICAL.md)** - Smart contract API and design
 - **[Adapters](adapters/)** - Framework integration examples (LangGraph, Tool-Agent)
+- **[Execution Layer](execution/nosana/README.md)** - Nosana execution provider integration
 
 ---
 
@@ -119,6 +120,7 @@ WAP3 enables autonomous AI agents to transact, verify, and collaborate securely 
 - **Smart Contract** (`contracts/AgentEscrow.sol`) - On-chain escrow and settlement
 - **Protocol Layer** (`src/protocol/`) - AP2 Intent and X402 Trigger schemas
 - **WAP3 SDK** (`src/wap3/`) - Client library for escrow operations
+- **Execution Layer** (`execution/`) - Abstraction for task execution providers (Nosana, etc.)
 - **Adapters** (`adapters/`) - Framework integration examples
 
 ### Transaction Lifecycle
@@ -134,7 +136,7 @@ WAP3 enables autonomous AI agents to transact, verify, and collaborate securely 
    └─> Funds locked on-chain
    
 4. Task Execution
-   └─> Agent executes work
+   └─> Agent executes work (via Execution Layer, e.g., Nosana)
    
 5. Proof Submission
    └─> Cryptographic proof stored
