@@ -24,27 +24,34 @@ async function main() {
 
   // Setup
   const [payer, agent] = await ethers.getSigners();
-  const escrowAddress = process.env.ESCROW_ADDRESS || (await ethers.getContractFactory("AgentEscrow")).getAddress();
   
+  async function getOrDeployEscrowAddress(): Promise<string> {
+    if (process.env.ESCROW_ADDRESS) return process.env.ESCROW_ADDRESS;
+
+    const Escrow = await ethers.getContractFactory("AgentEscrow");
+    const escrow = await Escrow.deploy();
+    await escrow.waitForDeployment();
+    return await escrow.getAddress();
+  }
+
+  const escrowAddress = await getOrDeployEscrowAddress();
   const wap3Client = new WAP3Client(escrowAddress, payer);
   const executionLayer = getExecutionLayer("nosana");
 
   // Step 1: Create AP2 Intent and X402 Trigger
   const taskDescription = "Analyze market similarity for event: Product launch announcement";
-  const intent = createAP2Intent({
-    taskType: "market_similarity",
-    description: taskDescription,
-    inputs: {
-      eventText: "Product launch announcement",
-      marketUniverse: ["AAPL", "MSFT", "GOOGL"]
-    }
-  });
+  const intent = createAP2Intent(
+    taskDescription,
+    ethers.formatEther(ethers.parseEther("0.1")),
+    ["market_similarity"]
+  );
 
-  const trigger = createX402Trigger({
-    amount: ethers.parseEther("0.1"),
-    currency: "ETH",
-    recipient: agent.address
-  });
+  const trigger = createX402Trigger(
+    intent.intent_id,
+    ethers.formatEther(ethers.parseEther("0.1")),
+    agent.address,
+    []
+  );
 
   console.log("📋 Task Intent:", JSON.stringify(intent, null, 2));
   console.log("💰 Payment Trigger:", JSON.stringify(trigger, null, 2));
@@ -56,7 +63,7 @@ async function main() {
   const { escrowId, txHash } = await wap3Client.createEscrow(
     agent.address,
     taskId,
-    trigger.amount
+    ethers.parseEther(trigger.amount)
   );
   console.log(`✓ Escrow created: ID=${escrowId}, TX=${txHash}`);
   console.log();
@@ -64,8 +71,11 @@ async function main() {
   // Step 3: Submit task to execution layer
   console.log("🚀 Submitting task to Nosana execution layer...");
   const receipt = await executionLayer.submit({
-    taskType: intent.taskType,
-    inputs: intent.inputs
+    taskType: "market_similarity",
+    inputs: {
+      eventText: "Product launch announcement",
+      marketUniverse: ["AAPL", "MSFT", "GOOGL"]
+    }
   });
   console.log(`✓ Execution submitted: ID=${receipt.executionId}, Provider Job ID=${receipt.providerJobId}`);
   console.log();

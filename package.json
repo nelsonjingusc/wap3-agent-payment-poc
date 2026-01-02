@@ -36,7 +36,7 @@
   "license": "MIT",
   "type": "commonjs",
   "dependencies": {
-    "@nosana/kit": "^1.0.0"
+    "@nosana/kit": "^2.0.38"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
