@@ -35,6 +35,9 @@
   "author": "Nan Jing <nelson.jingusc@gmail.com> (GioroX AI, Inc.)",
   "license": "MIT",
   "type": "commonjs",
+  "dependencies": {
+    "@nosana/kit": "^1.0.0"
+  },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
     "@typechain/hardhat": "^9.1.0",
