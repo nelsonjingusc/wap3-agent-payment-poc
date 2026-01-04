@@ -20,7 +20,10 @@
     "example:simple": "hardhat run examples/01-simple-payment.ts --network localhost",
     "example:refund": "hardhat run examples/02-refund-scenario.ts --network localhost",
     "example:multiple": "hardhat run examples/03-multiple-tasks.ts --network localhost",
-    "clean": "hardhat clean"
+    "clean": "hardhat clean",
+    "build:sui": "cd contracts/sui && sui move build",
+    "test:sui": "cd contracts/sui && sui move test",
+    "demo:sui": "ts-node demo/sui-demo.ts"
   },
   "keywords": [
     "web3",
@@ -28,6 +31,8 @@
     "escrow",
     "smart-contracts",
     "ethereum",
+    "sui",
+    "walrus",
     "payments",
     "blockchain",
     "autonomous-agents"
@@ -36,7 +41,10 @@
   "license": "MIT",
   "type": "commonjs",
   "dependencies": {
-    "@nosana/kit": "^2.0.38"
+    "@mysten/sui": "^1.45.2",
+    "@nosana/kit": "^2.0.38",
+    "axios": "^1.6.7",
+    "dotenv": "^16.4.1"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",

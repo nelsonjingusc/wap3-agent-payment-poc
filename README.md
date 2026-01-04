@@ -232,33 +232,54 @@ npm run test:gas
 
 ```
 wap3-agent-payment-poc/
-├── contracts/          # Solidity smart contracts
-├── src/                # TypeScript SDK and utilities
-│   ├── protocol/       # AP2 Intent + X402 Trigger schemas
-│   ├── wap3/          # WAP3 client library
-│   └── utils/         # Chain config and utilities
-├── demo/              # Demo scripts and examples
-│   ├── run_mvp_demo.sh        # One-command MVP demo
-│   ├── run_dual_agent_demo.sh # Dual-agent demo
-│   ├── agent-service.ts       # Service agent
-│   ├── buyer-client.ts        # Buyer client
-│   └── buyer-agent-langgraph.ts # LangGraph buyer agent
-├── adapters/          # Framework integration examples
-│   ├── langgraphjs/   # LangGraph adapter
-│   └── tool_agent/    # Tool-agent adapter
-├── test/              # Test suite
-└── examples/          # Usage examples
+├── contracts/                # Smart Contracts
+│   ├── AgentEscrow.sol       # EVM implementation
+│   └── sui/                  # Sui Move contracts
+│       ├── Move.toml         # Package manifest
+│       └── sources/
+│           ├── task_contract.move    # Core escrow contract
+│           └── reputation.move       # Reputation tracking
+├── src/                      # TypeScript SDK and utilities
+│   ├── protocol/             # AP2 Intent + X402 Trigger schemas
+│   ├── wap3/                 # WAP3 client library (EVM)
+│   ├── sui/                  # Sui blockchain client
+│   ├── walrus/               # Walrus storage client
+│   ├── mcp/                  # MCP tools for AI agents
+│   └── utils/                # Chain config and utilities
+├── demo/                     # Demo scripts and examples
+│   ├── run_mvp_demo.sh       # One-command MVP demo (EVM)
+│   ├── sui-demo.ts           # Sui + Walrus demo
+│   ├── run_dual_agent_demo.sh
+│   └── ...
+├── docs/                     # Documentation
+│   ├── SUI_SETUP.md          # Sui installation guide
+│   └── SUI_ARCHITECTURE.md   # Technical architecture
+├── adapters/                 # Framework integration examples
+│   ├── langgraphjs/          # LangGraph adapter
+│   └── tool_agent/           # Tool-agent adapter
+├── test/                     # Test suite
+├── examples/                 # Usage examples
+└── sui.config.ts             # Sui & Walrus configuration
 ```
 
 ---
 
 ## 🔗 Chain Support
 
+### EVM Chains
 **Default:** Hardhat Local (Chain ID: 31337)
 
 **Also Supports:**
 - Sepolia Testnet (Chain ID: 11155111)
 - Any EVM-compatible chain (via `hardhat.config.ts`)
+
+### Sui Blockchain
+**Default:** Sui Testnet
+
+**Also Supports:**
+- Sui Devnet
+- Sui Mainnet
+- Local Sui Network
 
 The protocol is **chain-agnostic** - core intent/trigger/audit layers work across all chains.
 
