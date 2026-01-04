@@ -66,9 +66,15 @@ export class SuiTaskClient {
 
         // Initialize keypair if private key provided
         if (config.privateKey) {
-            this.keypair = Ed25519Keypair.fromSecretKey(
-                Buffer.from(config.privateKey, 'hex')
-            );
+            // Support both Bech32 (suiprivkey1...) and hex formats
+            if (config.privateKey.startsWith('suiprivkey')) {
+                this.keypair = Ed25519Keypair.fromSecretKey(config.privateKey);
+            } else {
+                // Legacy hex format support
+                this.keypair = Ed25519Keypair.fromSecretKey(
+                    Buffer.from(config.privateKey, 'hex')
+                );
+            }
         }
     }
 
