@@ -83,23 +83,23 @@ export class SuiTaskClient {
         const tx = new Transaction();
 
         // Split coin for payment
-        const [coin] = tx.splitCoins(tx.gas, [tx.pure(params.rewardAmount)]);
+        const [coin] = tx.splitCoins(tx.gas, [params.rewardAmount]);
 
         // Call create_task function
         tx.moveCall({
             target: `${this.config.packageId}::task_contract::create_task`,
             arguments: [
-                tx.pure(Array.from(Buffer.from(params.targetInfo, 'utf-8'))),  // target_info
+                tx.pure.vector('u8', Array.from(Buffer.from(params.targetInfo, 'utf-8'))),  // target_info
                 coin,                                                            // reward
-                tx.pure(params.deadline),                                       // deadline
-                tx.pure(params.maxMiners),                                      // max_miners
+                tx.pure.u64(params.deadline),                                   // deadline
+                tx.pure.u64(params.maxMiners),                                  // max_miners
                 tx.object('0x6'),                                               // clock object
             ],
         });
 
         const result = await this.client.signAndExecuteTransaction({
             signer: this.keypair,
-            transactionBlock: tx,
+            transaction: tx,
             options: {
                 showEffects: true,
                 showObjectChanges: true,
@@ -135,7 +135,7 @@ export class SuiTaskClient {
 
         const result = await this.client.signAndExecuteTransaction({
             signer: this.keypair,
-            transactionBlock: tx,
+            transaction: tx,
             options: {
                 showEffects: true,
                 showObjectChanges: true,
@@ -171,17 +171,17 @@ export class SuiTaskClient {
         tx.moveCall({
             target: `${this.config.packageId}::task_contract::submit_evidence`,
             arguments: [
-                tx.object(taskId),                          // task
-                tx.object(claimId),                         // claim
-                tx.pure(Array.from(blobIdBytes)),          // blob_id
-                tx.pure(Array.from(evidenceHashBytes)),    // evidence_hash
-                tx.object('0x6'),                          // clock
+                tx.object(taskId),                                   // task
+                tx.object(claimId),                                  // claim
+                tx.pure.vector('u8', Array.from(blobIdBytes)),      // blob_id
+                tx.pure.vector('u8', Array.from(evidenceHashBytes)), // evidence_hash
+                tx.object('0x6'),                                    // clock
             ],
         });
 
         const result = await this.client.signAndExecuteTransaction({
             signer: this.keypair,
-            transactionBlock: tx,
+            transaction: tx,
             options: {
                 showEffects: true,
                 showObjectChanges: true,
@@ -214,13 +214,13 @@ export class SuiTaskClient {
             target: `${this.config.packageId}::task_contract::verify_and_settle`,
             arguments: [
                 tx.object(taskId),                          // task
-                tx.makeMoveVec({ objects: submissions }),   // approved_submissions vector
+                tx.makeMoveVec({ elements: submissions }),   // approved_submissions vector
             ],
         });
 
         const result = await this.client.signAndExecuteTransaction({
             signer: this.keypair,
-            transactionBlock: tx,
+            transaction: tx,
             options: {
                 showEffects: true,
                 showEvents: true,
@@ -253,7 +253,7 @@ export class SuiTaskClient {
 
         const result = await this.client.signAndExecuteTransaction({
             signer: this.keypair,
-            transactionBlock: tx,
+            transaction: tx,
             options: {
                 showEffects: true,
             },
@@ -334,7 +334,7 @@ export class SuiTaskClient {
     }
 
     private extractCreatedObjectId(
-        result: SuiTransactionResponse,
+        result: any,
         objectType: string
     ): string {
         const created = result.objectChanges?.find(

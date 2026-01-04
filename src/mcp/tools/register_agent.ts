@@ -33,7 +33,7 @@ export async function registerAgent(
 
         const result = await client['client'].signAndExecuteTransaction({
             signer: client['keypair']!,
-            transactionBlock: tx,
+            transaction: tx,
             options: {
                 showEffects: true,
                 showObjectChanges: true,

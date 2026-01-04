@@ -1,0 +1,12 @@
+# Sui Configuration
+SUI_NETWORK=testnet
+SUI_PRIVATE_KEY=your_private_key_from_sui_keytool
+SUI_PACKAGE_ID=0x4a344bda6321eeee474976330460eb8d9cb68e33091efe9a272aa151dc679067
+
+# Walrus Configuration
+WALRUS_NETWORK=testnet
+WALRUS_AGGREGATOR_URL=https://aggregator.walrus-testnet.walrus.space
+WALRUS_STORAGE_URL=https://walrus-testnet.walrus.space
+
+# Enable mock mode for development/testing (without Walrus access)
+WALRUS_MOCK_MODE=true
