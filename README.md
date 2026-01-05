@@ -4,43 +4,73 @@
 
 ---
 
-## 🚀 Quick Start - Run the Demo
+## 🚀 Quick Start - Run the Demos
 
-**One command to see it in action:**
+### Sui + Walrus Demo (Recommended)
+
+**See agent payments on Sui Testnet:**
+
+```bash
+npm run demo:sui
+```
+
+**What it demonstrates:**
+- ✅ Real Sui testnet transactions
+- ✅ Complete task lifecycle (create → claim → execute → verify → settle)
+- ✅ Walrus decentralized storage integration
+- ✅ 0.1 SUI payment automation
+- ✅ On-chain provenance verification
+
+### Agent Framework Demos
+
+**LangChain Agent Demo:**
+```bash
+npm run demo:langchain
+```
+Simulated AI agent using LangChain tools for autonomous task management.
+
+**LangGraph Workflow Demo:**
+```bash
+npm run demo:langgraph
+```
+Stateful workflow with automatic state transitions.
+
+**MCP Protocol Demo:**
+```bash
+npm run demo:mcp
+```
+Model Context Protocol integration for tool discovery and execution.
+
+### Legacy EVM Demo
 
 ```bash
 ./demo/run_mvp_demo.sh
 ```
 
-**Expected output:**
-```
-MVP:AP2_INTENT_ID=0x...
-MVP:X402_PAYMENT_ID=0x...
-MVP:ESCROW_ID=0
-MVP:PROOF_HASH=0x...
-MVP:SETTLE_TX=0x...
-MVP:AUDIT_JSON=demo/out/session_*/audit.json
-```
-
 **What it demonstrates:**
-- ✅ AP2 Intent creation (Google AP2, 2025 Q3)
-- ✅ X402 Payment trigger (Coinbase X402, 2025 Q2)
-- ✅ On-chain escrow creation
-- ✅ Autonomous agent task execution
-- ✅ Proof submission and verification
-- ✅ Automatic payment settlement
+- ✅ AP2 Intent creation (Google AP2)
+- ✅ X402 Payment trigger (Coinbase X402)
+- ✅ EVM-compatible escrow
 - ✅ Complete audit trail export
-
-**Note:** Demo defaults to skip compilation for reliability and will automatically compile if supported by your environment.
 
 ---
 
 ## 📖 Documentation
 
-- **[Demo Guide](demo/README.md)** - Detailed demo instructions and architecture
-- **[Technical Documentation](TECHNICAL.md)** - Smart contract API and design
-- **[Adapters](adapters/)** - Framework integration examples (LangGraph, Tool-Agent)
-- **[Execution Layer](execution/nosana/README.md)** - Nosana execution provider integration
+### Sui Implementation
+- **[Sui Setup Guide](docs/SUI_SETUP.md)** - Complete setup and deployment guide
+- **[Sui Architecture](docs/SUI_ARCHITECTURE.md)** - Technical architecture and design
+- **[Sui Demo](demo/sui-demo.ts)** - End-to-end demo source code
+
+### Agent Framework Integration
+- **[LangChain Tools](adapters/langchain-tools/README.md)** - DynamicStructuredTool wrappers
+- **[LangGraph Workflow](adapters/sui-langgraph/README.md)** - Stateful workflow implementation
+- **[MCP Server](src/mcp/server.ts)** - Model Context Protocol server
+
+### Legacy EVM
+- **[Demo Guide](demo/README.md)** - EVM demo instructions
+- **[Technical Documentation](TECHNICAL.md)** - Smart contract API
+- **[Execution Layer](execution/nosana/README.md)** - Nosana integration
 
 ---
 
@@ -97,12 +127,39 @@ WAP3 enables autonomous AI agents to transact, verify, and collaborate securely 
 
 ### Key Features
 
-- **Programmable Escrow** - On-chain escrow with smart contract automation
+#### Core Infrastructure
+- **Programmable Escrow** -  On-chain escrow with smart contract automation
 - **Proof-Based Verification** - Cryptographic proofs stored on decentralized storage (Walrus, IPFS)
 - **Sub-Second Settlement** - Micro-payment support with instant verification
-- **Multi-Chain Support** - Works on any EVM-compatible chain
+- **Multi-Chain Support** - Works on EVM and Sui blockchains
 - **Full Provenance** - Immutable on-chain audit trails
 - **Zero Intermediaries** - Trustless, cryptographic guarantees
+
+#### Agent Framework Integration (NEW! ✨)
+
+**LangChain Tools** - Ready-to-use tools for AI agents:
+- ✅ 6 DynamicStructuredTool wrappers with Zod validation
+- ✅ Type-safe interfaces for all WAP3 operations
+- ✅ Comprehensive error handling
+- ✅ Works with any LangChain-based agent
+
+**LangGraph Workflow** - Stateful workflow orchestration:
+- ✅ Pre-built workflow nodes for complete task lifecycle
+- ✅ State management with WorkflowState interface
+- ✅ Conditional branching and error recovery
+- ✅ Easy integration with @langchain/langgraph
+
+**MCP (Model Context Protocol) Server** - Industry-standard tool protocol:
+- ✅ Full MCP protocol implementation
+- ✅ Tool discovery and schema validation
+- ✅ Compatible with Claude Desktop and other MCP clients
+- ✅ Language-agnostic architecture
+
+**Key Benefits**:
+- 🤖 Plug-and-play integration with popular AI frameworks
+- 🔒 Type-safe with zero compilation errors
+- 📝 Comprehensive documentation and examples
+- 🧪 Production-ready code with complete demos
 
 ### Use Cases
 
@@ -234,7 +291,7 @@ npm run test:gas
 wap3-agent-payment-poc/
 ├── contracts/                # Smart Contracts
 │   ├── AgentEscrow.sol       # EVM implementation
-│   └── sui/                  # Sui Move contracts
+│   └── sui/                  # Sui Move contracts ✨
 │       ├── Move.toml         # Package manifest
 │       └── sources/
 │           ├── task_contract.move    # Core escrow contract
@@ -242,25 +299,38 @@ wap3-agent-payment-poc/
 ├── src/                      # TypeScript SDK and utilities
 │   ├── protocol/             # AP2 Intent + X402 Trigger schemas
 │   ├── wap3/                 # WAP3 client library (EVM)
-│   ├── sui/                  # Sui blockchain client
-│   ├── walrus/               # Walrus storage client
-│   ├── mcp/                  # MCP tools for AI agents
+│   ├── sui/                  # Sui blockchain client ✨
+│   ├── walrus/               # Walrus storage client ✨
+│   ├── mcp/                  # MCP server and tools ✨ NEW!
+│   │   └── server.ts         # Model Context Protocol server
 │   └── utils/                # Chain config and utilities
+├── adapters/                 # Framework integration ✨ NEW!
+│   ├── langchain-tools/      # LangChain DynamicStructuredTool wrappers
+│   │   ├── wap3-tools.ts     # 6 tool implementations
+│   │   └── README.md         # Tool documentation
+│   ├── sui-langgraph/        # LangGraph workflow adapter
+│   │   ├── workflow.ts       # Stateful workflow nodes
+│   │   └── README.md         # Workflow documentation
+│   ├── langgraphjs/          # Legacy LangGraph adapter (EVM)
+│   └── tool_agent/           # Legacy tool-agent adapter (EVM)
 ├── demo/                     # Demo scripts and examples
+│   ├── sui-demo.ts           # Sui + Walrus demo ✨
+│   ├── langchain-agent-demo.ts  # LangChain agent demo ✨ NEW!
+│   ├── langgraph-workflow-demo.ts  # LangGraph workflow demo ✨ NEW!
+│   ├── mcp-client-demo.ts    # MCP client demo ✨ NEW!
 │   ├── run_mvp_demo.sh       # One-command MVP demo (EVM)
-│   ├── sui-demo.ts           # Sui + Walrus demo
 │   ├── run_dual_agent_demo.sh
 │   └── ...
 ├── docs/                     # Documentation
-│   ├── SUI_SETUP.md          # Sui installation guide
-│   └── SUI_ARCHITECTURE.md   # Technical architecture
-├── adapters/                 # Framework integration examples
-│   ├── langgraphjs/          # LangGraph adapter
-│   └── tool_agent/           # Tool-agent adapter
+│   ├── SUI_SETUP.md          # Sui installation guide ✨
+│   └── SUI_ARCHITECTURE.md   # Technical architecture ✨
 ├── test/                     # Test suite
 ├── examples/                 # Usage examples
-└── sui.config.ts             # Sui & Walrus configuration
+└── sui.config.ts             # Sui & Walrus configuration ✨
 ```
+
+**✨ = New in this release**
+
 
 ---
 
@@ -287,6 +357,27 @@ The protocol is **chain-agnostic** - core intent/trigger/audit layers work acros
 
 ## 🔧 Development
 
+### Sui Development
+```bash
+# Build Sui Move contracts
+npm run build:sui
+
+# Test Sui contracts
+npm run test:sui
+
+# Run Sui demo
+npm run demo:sui
+
+# Run agent framework demos
+npm run demo:langchain
+npm run demo:langgraph  
+npm run demo:mcp
+
+# Start MCP server
+npm run mcp:server
+```
+
+### EVM Development
 ```bash
 # Start local Hardhat node
 npm run node
@@ -297,8 +388,16 @@ npm run deploy:localhost
 # Run specific demo
 npm run demo:agent
 npm run demo:buyer
-npm run demo:buyer-agent
 npm run demo:dual-agent
+```
+
+### TypeScript Compilation
+```bash
+# Build TypeScript
+npm run build
+
+# Run tests
+npm test
 ```
 
 ---
