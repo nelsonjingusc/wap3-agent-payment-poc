@@ -4,22 +4,8 @@
   "description": "Web3-based Agent Payment & Escrow PoC - Enabling autonomous AI agent payments with programmable escrow",
   "main": "index.js",
   "scripts": {
-    "compile": "hardhat compile",
+    "build": "tsc",
     "test": "hardhat test",
-    "test:coverage": "hardhat coverage",
-    "test:gas": "REPORT_GAS=true hardhat test",
-    "node": "hardhat node",
-    "deploy": "hardhat run scripts/deploy.ts",
-    "deploy:localhost": "hardhat run scripts/deploy.ts --network localhost",
-    "demo": "hardhat run --no-compile scripts/demo-agent-payment.ts --network localhost",
-    "demo:mvp": "./demo/run_mvp_demo.sh",
-    "demo:agent": "hardhat run --no-compile demo/agent-service.ts --network localhost",
-    "demo:buyer": "hardhat run --no-compile demo/buyer-client.ts --network localhost",
-    "demo:buyer-agent": "hardhat run --no-compile demo/buyer-agent-langgraph.ts --network localhost",
-    "demo:dual-agent": "./demo/run_dual_agent_demo.sh",
-    "example:simple": "hardhat run examples/01-simple-payment.ts --network localhost",
-    "example:refund": "hardhat run examples/02-refund-scenario.ts --network localhost",
-    "example:multiple": "hardhat run examples/03-multiple-tasks.ts --network localhost",
     "clean": "hardhat clean",
     "build:sui": "cd contracts/sui && sui move build",
     "test:sui": "cd contracts/sui && sui move test",
@@ -41,10 +27,13 @@
   "license": "MIT",
   "type": "commonjs",
   "dependencies": {
+    "@langchain/core": "^1.1.8",
+    "@modelcontextprotocol/sdk": "^1.25.1",
     "@mysten/sui": "^1.45.2",
     "@nosana/kit": "^2.0.38",
     "axios": "^1.6.7",
-    "dotenv": "^16.4.1"
+    "dotenv": "^16.4.1",
+    "zod": "^4.3.5"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
