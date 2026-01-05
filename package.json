@@ -9,7 +9,11 @@
     "clean": "hardhat clean",
     "build:sui": "cd contracts/sui && sui move build",
     "test:sui": "cd contracts/sui && sui move test",
-    "demo:sui": "ts-node demo/sui-demo.ts"
+    "demo:sui": "ts-node demo/sui-demo.ts",
+    "demo:langchain": "ts-node demo/langchain-agent-demo.ts",
+    "demo:langgraph": "ts-node demo/langgraph-workflow-demo.ts",
+    "demo:mcp": "ts-node demo/mcp-client-demo.ts",
+    "mcp:server": "ts-node src/mcp/server.ts"
   },
   "keywords": [
     "web3",
