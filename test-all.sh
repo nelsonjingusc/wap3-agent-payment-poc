@@ -3,8 +3,6 @@
 # WAP3 Agent Framework Integration - Automated Test Suite
 # Run this script to verify all agent framework features
 
-set -e  # Exit on error
-
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -36,10 +34,10 @@ print_test_header() {
 print_result() {
     if [ $1 -eq 0 ]; then
         echo -e "${GREEN}✓ PASSED${NC}"
-        ((TESTS_PASSED++))
+        TESTS_PASSED=$((TESTS_PASSED + 1))
     else
         echo -e "${RED}✗ FAILED${NC}"
-        ((TESTS_FAILED++))
+        TESTS_FAILED=$((TESTS_FAILED + 1))
     fi
 }
 
@@ -68,7 +66,7 @@ for file in "adapters/langchain-tools/wap3-tools.ts" \
         echo "  ✓ $file"
     else
         echo -e "  ${RED}✗ $file (missing)${NC}"
-        ((FILES_MISSING++))
+        FILES_MISSING=$((FILES_MISSING + 1))
     fi
 done
 
@@ -80,7 +78,7 @@ for file in "demo/langchain-agent-demo.ts" \
         echo "  ✓ $file"
     else
         echo -e "  ${RED}✗ $file (missing)${NC}"
-        ((FILES_MISSING++))
+        FILES_MISSING=$((FILES_MISSING + 1))
     fi
 done
 
@@ -91,7 +89,7 @@ for file in "src/mcp/server.ts" \
         echo "  ✓ $file"
     else
         echo -e "  ${RED}✗ $file (missing)${NC}"
-        ((FILES_MISSING++))
+        FILES_MISSING=$((FILES_MISSING + 1))
     fi
 done
 
@@ -112,7 +110,7 @@ for script in "demo:langchain" "demo:langgraph" "demo:mcp" "mcp:server"; do
         echo "  ✓ $script"
     else
         echo -e "  ${RED}✗ $script (missing)${NC}"
-        ((SCRIPTS_MISSING++))
+        SCRIPTS_MISSING=$((SCRIPTS_MISSING + 1))
     fi
 done
 
@@ -161,7 +159,7 @@ for dep in "@langchain/core" "zod" "@modelcontextprotocol/sdk"; do
         echo "  ✓ $dep"
     else
         echo -e "  ${RED}✗ $dep (missing)${NC}"
-        ((DEPS_MISSING++))
+        DEPS_MISSING=$((DEPS_MISSING + 1))
     fi
 done
 
