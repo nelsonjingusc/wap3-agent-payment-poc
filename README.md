@@ -2,6 +2,15 @@
 
 **Building the programmable financial layer for the Agent Economy.**
 
+[![Version](https://img.shields.io/badge/version-0.5.0-blue.svg)](./VERSION)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](./LICENSE)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue.svg)](https://www.typescriptlang.org/)
+[![Sui](https://img.shields.io/badge/Sui-Testnet-orange.svg)](https://sui.io/)
+
+**Latest Release**: v0.5.0 - Agent Framework Integration  
+**Release Date**: January 6, 2026  
+**Status**: ✅ Production Ready for Testing
+
 ---
 
 ## 🚀 Quick Start - Run the Demos
@@ -57,20 +66,25 @@ Model Context Protocol integration for tool discovery and execution.
 
 ## 📖 Documentation
 
-### Sui Implementation
-- **[Sui Setup Guide](docs/SUI_SETUP.md)** - Complete setup and deployment guide
-- **[Sui Architecture](docs/SUI_ARCHITECTURE.md)** - Technical architecture and design
-- **[Sui Demo](demo/sui-demo.ts)** - End-to-end demo source code
+### 📋 Essential Reading
+- **[Quick Start Guide](docs/SUI_SETUP.md)** - Get started in 5 minutes
+- **[Status & Roadmap](docs/STATUS.md)** - Version history and future plans
+- **[Requirements](docs/REQUIREMENTS.md)** - Formal specifications
+- **[Testing Guide](docs/TESTING.md)** - Comprehensive test documentation
 
-### Agent Framework Integration
+### 🏗️ Technical Documentation
+- **[Architecture Overview](docs/ARCHITECTURE.md)** - System design and APIs
+- **[Sui Implementation](docs/SUI_ARCHITECTURE.md)** - Blockchain architecture
+- **[Project Structure](docs/PROJECT_STRUCTURE.md)** - Codebase organization
+
+### 🔌 Integration Guides
 - **[LangChain Tools](adapters/langchain-tools/README.md)** - DynamicStructuredTool wrappers
-- **[LangGraph Workflow](adapters/sui-langgraph/README.md)** - Stateful workflow implementation
-- **[MCP Server](src/mcp/server.ts)** - Model Context Protocol server
+- **[LangGraph Workflow](adapters/sui-langgraph/README.md)** - Stateful workflow nodes
+- **[MCP Server](src/mcp/server.ts)** - Model Context Protocol implementation
 
-### Legacy EVM
-- **[Demo Guide](demo/README.md)** - EVM demo instructions
-- **[Technical Documentation](TECHNICAL.md)** - Smart contract API
-- **[Execution Layer](execution/nosana/README.md)** - Nosana integration
+### 📝 Additional Resources
+- **[Demo Scripts](demo/)** - Working code examples
+- **[Test Suite](test-all.sh)** - Automated testing
 
 ---
 
