@@ -1,6 +1,7 @@
 /**
  * Sui + Walrus Demo - Complete End-to-End Task Flow
  * Demonstrates agent payment and provenance on Sui blockchain with Walrus storage
+ * Now integrated with AP2/X402 protocol layer for chain-agnostic intent and payment triggers
  */
 
 import * as dotenv from 'dotenv';
@@ -9,6 +10,10 @@ import { createWalrusClient } from '../src/walrus/walrus-client';
 import { getActiveSuiConfig, getActiveWalrusConfig } from '../sui.config';
 import * as fs from 'fs';
 import * as path from 'path';
+
+// Import AP2/X402 Protocol Layer (Chain-Agnostic)
+import { createAP2Intent, hashAP2Intent, formatIntentId } from '../src/protocol/intent_ap2';
+import { createX402Trigger, hashX402Trigger, formatPaymentId, linkTriggerToIntent } from '../src/protocol/trigger_x402';
 
 // Load environment variables
 dotenv.config();

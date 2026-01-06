@@ -1,13 +1,41 @@
 # WAP3 Agent Payment & Provenance Platform
 ## Status & Release History
 
-**Current Version**: 0.5.0  
+**Current Version**: 0.51.0  
 **Release Date**: January 6, 2026  
 **Status**: Beta - Production Ready for Testing
 
 ---
 
 ## Version History
+
+### v0.51.0 - AP2/X402 Protocol Integration (January 6, 2026)
+
+**Protocol Layer Integration**:
+- ✅ **AP2 Intent Protocol** - Chain-agnostic intent creation (Google AP2 2025 Q3)
+- ✅ **X402 Payment Triggers** - Universal payment protocol (Coinbase X402 2025 Q2)
+- ✅ **Refactored for Chain-Agnostic** - Removed ethers.js dependency, now works with any blockchain
+- ✅ **Sui Integration Ready** - Protocols work seamlessly with Sui, EVM, Solana, etc.
+
+**Technical Changes**:
+- Refactored `src/protocol/intent_ap2.ts` to use Node.js crypto instead of ethers
+- Refactored `src/protocol/trigger_x402.ts` for universal blockchain support
+- Added `intentToMetadata()` and `triggerToMetadata()` for on-chain storage
+- Created `demo/ap2-x402-example.ts` demonstrating protocol usage
+- Added `linkTriggerToIntent()` for protocol linking
+
+**Demonstration**:
+```bash
+npm run demo:ap2  # Run AP2/X402 protocol demo
+```
+
+**Why This Matters**:
+- AP2/X402 are industry-standard protocols
+- No longer EVM-only, now truly blockchain-agnostic
+- Can use with Sui, Ethereum, Solana, or any chain
+- Protocol layer sits above blockchain layer
+
+---
 
 ### v0.5.0 - Agent Framework Integration (January 6, 2026)
 

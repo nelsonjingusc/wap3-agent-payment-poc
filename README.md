@@ -2,12 +2,12 @@
 
 **Building the programmable financial layer for the Agent Economy.**
 
-[![Version](https://img.shields.io/badge/version-0.5.0-blue.svg)](./VERSION)
+[![Version](https://img.shields.io/badge/version-0.5.2-blue.svg)](./VERSION)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](./LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue.svg)](https://www.typescriptlang.org/)
 [![Sui](https://img.shields.io/badge/Sui-Testnet-orange.svg)](https://sui.io/)
 
-**Latest Release**: v0.5.0 - Agent Framework Integration  
+**Latest Release**: v0.5.2 - Mac Compatibility Fix  
 **Release Date**: January 6, 2026  
 **Status**: ✅ Production Ready for Testing
 
