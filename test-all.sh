@@ -2,6 +2,7 @@
 
 # WAP3 Agent Framework Integration - Automated Test Suite
 # Run this script to verify all agent framework features
+# Cross-platform compatible (Mac/Linux)
 
 # Colors for output
 RED='\033[0;31m'
@@ -193,15 +194,51 @@ elif [ ! -f .env ]; then
     echo "  SUI_PACKAGE_ID=..."
     print_result 0
 else
-    # Run demo with longer timeout and better error handling
-    echo -e "${BLUE}Running live demo (timeout: 300 seconds)...${NC}"
-    if timeout 300s npm run demo:langchain 2>&1 | tee /tmp/demo-output.txt | grep -q "Demo Completed Successfully"; then
+    # Run demo with cross-platform timeout (Mac/Linux compatible)
+    echo -e "${BLUE}Running live demo (max 300 seconds)...${NC}"
+    echo ""
+    
+    # Run demo in background and save output
+    npm run demo:langchain > /tmp/demo-output.txt 2>&1 &
+    DEMO_PID=$!
+    
+    # Wait with timeout (cross-platform)
+    WAIT_TIME=0
+    MAX_WAIT=300
+    STILL_RUNNING=1
+    
+    while [ $WAIT_TIME -lt $MAX_WAIT ]; do
+        # Check if process still running
+        if ! kill -0 $DEMO_PID 2>/dev/null; then
+            STILL_RUNNING=0
+            break
+        fi
+        
+        sleep 5
+        WAIT_TIME=$((WAIT_TIME + 5))
+        
+        # Show progress every 30 seconds
+        if [ $((WAIT_TIME % 30)) -eq 0 ]; then
+            echo "  ... still running ($WAIT_TIME seconds elapsed)"
+        fi
+    done
+    
+    # If still running after timeout, kill it
+    if [ $STILL_RUNNING -eq 1 ]; then
+        echo ""
+        echo -e "${YELLOW}⚠️  Demo timeout after ${MAX_WAIT} seconds${NC}"
+        kill $DEMO_PID 2>/dev/null
+        wait $DEMO_PID 2>/dev/null
+    fi
+    
+    # Check if demo completed successfully
+    if grep -q "Demo Completed Successfully" /tmp/demo-output.txt 2>/dev/null; then
         echo ""
         echo -e "${GREEN}Demo completed successfully!${NC}"
         
         # Extract key information
-        TASK_ID=$(cat /tmp/demo-output.txt | grep "Task ID:" | tail -1 | awk '{print $3}')
-        TX_HASH=$(cat /tmp/demo-output.txt | grep "Settlement Tx:" | tail -1 | awk '{print $3}')
+        TASK_ID=$(grep "Task ID:" /tmp/demo-output.txt 2>/dev/null | tail -1 | awk '{print $3}')
+        TX_HASH=$(grep "Settlement Tx:" /tmp/demo-output.txt 2>/dev/null | tail -1 | awk '{print $3}')
         
         if [ ! -z "$TASK_ID" ]; then
             echo "  Task ID: $TASK_ID"
