@@ -222,9 +222,32 @@ npm run test:coverage
 
 # Run with gas reporting
 npm run test:gas
+
+# Test Nosana integration
+npm run test:nosana
 ```
 
 **Test Results:** 18/18 passing ✅
+
+### Nosana Execution Layer Testing
+
+Test the Nosana execution layer integration:
+
+```bash
+# Run comprehensive Nosana integration test
+npm run test:nosana
+
+# Or run individual demos
+npm run demo:nosana              # Standalone execution layer
+npm run demo:nosana-escrow       # Full escrow integration
+```
+
+**Features Tested:**
+- Task submission to Nosana (GPU-enabled containers)
+- Real-time job monitoring via event stream
+- IPFS result retrieval
+- Integration with WAP3 escrow
+- Proof-based payment settlement
 
 ---
 
