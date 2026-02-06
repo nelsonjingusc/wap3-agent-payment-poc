@@ -150,6 +150,41 @@ WAP3 enables autonomous AI agents to transact, verify, and collaborate securely 
 
 ---
 
+## Nosana Execution & GPU Usage
+
+WAP3 provides agent-native payment, escrow and provenance for compute workloads. Nosana serves as the primary GPU execution backend.
+
+### Execution Flow
+
+When an agent needs GPU compute:
+- Build job spec → Submit to Nosana → Monitor completion → Retrieve results → Settle in WAP3
+
+The execution layer (`execution/nosana`) wraps `@nosana/kit` v2:
+
+```typescript
+const client = createNosanaClient(NosanaNetwork.MAINNET, { api: { apiKey } });
+const jobResponse = await client.api.jobs.create({ market, jobDefinition });
+const [events, stop] = await client.jobs.monitor();
+const output = await client.ipfs.retrieve(ipfsResult);
+```
+
+### GPU Workloads
+
+Primary compute tasks:
+- **Option-style pricing**: Risk-neutral probability estimation for prediction markets
+- **Market similarity**: Vector embeddings and clustering across venues
+- **Agent signals**: Scenario simulation and model-based analysis
+
+### PredictorIQ Integration
+
+Reference product built on WAP3 for prediction market intelligence:
+- Connects to Polymarket, Kalshi, Limitless
+- Runs GPU-heavy workloads on Nosana
+- Uses WAP3 for escrow and settlement
+- Maintains provenance for all compute jobs
+
+---
+
 ## 📦 Installation
 
 ```bash
