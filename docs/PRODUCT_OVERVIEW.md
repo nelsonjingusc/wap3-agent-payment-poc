@@ -21,7 +21,7 @@ flowchart TB
     style WAP3 fill:#1f6feb,stroke:#0b3d91,color:#fff,stroke-width:3px
 ```
 
-**Grant & Revenue Notes:**
+**Grant & Revenue Notes (potential / in discussion):**
 - ~50% of grant → Nosana GPU credits (13k–15k GPU hours over 6 months)
 - Post-grant: Usage fees + subscription tiers
 

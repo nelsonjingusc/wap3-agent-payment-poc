@@ -1,7 +1,9 @@
 # WAP3 + PredictorIQ – Business Model Canvas
 
+*Diagram lists render left-aligned in GitHub and most Mermaid viewers.*
+
 ```mermaid
-%%{init: {'theme':'base', 'themeVariables': { 'fontSize':'15px'}}}%%
+%%{init: {'theme':'base', 'themeVariables': { 'fontSize':'15px', 'textAlign':'left'}}}%%
 graph TB
     subgraph TOP[" "]
         direction LR
@@ -12,18 +14,18 @@ graph TB
     
     subgraph MID[" "]
         direction LR
-        VP["<b>VALUE PROPOSITIONS</b><br/><br/><b>AI/Agent Builders:</b><br/>• Agent payment & escrow<br/>• Verifiable execution<br/>• Reference vertical<br/><br/><b>Institutional:</b><br/>• Probability shift detection<br/>• Explainable signals"]
-        CH["<b>CHANNELS</b><br/><br/>• Direct outreach<br/>• Design programs<br/>• Web3/AI grants<br/>• Tech communities"]
+        VP["<b>VALUE PROPOSITIONS</b><br/><br/><b>AI/Agent Builders:</b><br/>• Agent payment & escrow<br/>• Verifiable execution<br/>• Reference vertical<br/><br/><b>Institutional:</b><br/>• Probability shift detection<br/>• Explainable signals<br/><br/><b>Regular users:</b><br/>• Onboard prediction markets<br/>• Explainable edge & alerts"]
+        CH["<b>CHANNELS</b><br/><br/>• Direct outreach to funds/risk teams<br/>• Web3/AI grants & co-marketing<br/>• NEC X! ecosystem<br/>• Tech communities & demos"]
     end
     
     subgraph CUST[" "]
-        CS["<b>CUSTOMER SEGMENTS</b><br/><br/>• AI/Agent builders & Web3 teams<br/>• Institutional users<br/>• Advanced traders (later)<br/>• Prediction market platforms<br/>• Ecosystem partners"]
+        CS["<b>CUSTOMER SEGMENTS</b><br/><br/>• AI/Agent builders & Web3 teams<br/>• Institutional users<br/>• Regular users (casino/betting curious, we onboard & give edge)<br/>• Advanced traders (later)<br/>• Prediction market platforms<br/>• Ecosystem partners"]
     end
     
     subgraph FIN[" "]
         direction LR
-        COST["<b>COST STRUCTURE</b><br/><br/>• GPU costs (Nosana)<br/>• Infrastructure<br/>• R&D (models, backtests)<br/>• Business dev"]
-        REV["<b>REVENUE STREAMS</b><br/><br/><b>Primary (WAP3):</b><br/>• Usage-based fees<br/><br/><b>Secondary:</b><br/>• Subscriptions<br/><br/><b>Long-term:</b><br/>• Enterprise"]
+        COST["<b>COST STRUCTURE</b><br/><br/>• R&D (systems, models)<br/>• Business development<br/>• GPU costs (Nosana)<br/>• IT / infrastructure"]
+        REV["<b>REVENUE STREAMS</b><br/><br/><b>Primary (WAP3):</b><br/>• Transaction fees<br/><br/><b>Primary (Vertical - PredictorIQ):</b><br/>• Subscriptions<br/><br/><b>Long-term:</b><br/>• Enterprise"]
     end
     
     classDef infra fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
@@ -70,6 +72,10 @@ Primary segments:
   - Policy / research organizations
   - Infrastructure and operations teams needing early risk signals
 
+- **Regular users**
+  - Casino/betting curious, heard of prediction markets but new to it
+  - We onboard them, explain, and give them edge and alerts
+
 - **Advanced individual users / traders** (later, via PredictorIQ frontends)
   - Sophisticated traders seeking market quality insights
   - Users wanting structural anomaly alerts
@@ -98,6 +104,11 @@ For **institutional users**:
 - Early detection of probability shifts around high-impact events
 - Explainable risk signals (price quality + wallet quality)
 - Integration into dashboards, models, or internal agents
+
+For **regular users**:
+
+- Onboard to prediction markets (explain, demystify)
+- Explainable edge and alerts (not black box)
 
 For **advanced individual users** (later):
 
@@ -168,25 +179,25 @@ For **ecosystem partners**:
 - Direct founder-led outreach to:
   - Funds / risk teams
   - Agent platform builders
-- Participation in:
-  - Web3 / AI grants and accelerators (NEC X, Nosana program, etc.)
-  - Technical communities (prediction markets, LangGraph, agentic AI)
-- Content and demos:
-  - Public MVP demos (dual-agent demo, risk-signal demo)
-  - AIGC-generated briefings as a human-friendly entry point
+- Web3 / AI grants, accelerators & co-marketing:
+  - NEC X! ecosystem
+  - Nosana program, etc.
+- Technical communities and demos:
+  - Prediction markets, LangGraph, agentic AI
+  - Public MVP demos, AIGC briefings
 
 ---
 
 ## 8. Revenue Streams
 
-**Web3 / WAP3 usage (primary)**:
+**Primary (WAP3)**:
 
-1. **Usage-based fees** for agent workloads executed via WAP3
+1. **Transaction fees** for agent workloads executed via WAP3
    - Billing tied to WAP3 usage and compute consumption
    - Pass-through of GPU costs plus a margin
    - Applies to any agent workflow using WAP3 (not just PredictorIQ)
 
-**PredictorIQ vertical (secondary)**:
+**Primary (Vertical Application - PredictorIQ)**:
 
 2. **Subscription tiers** for institutional access to PredictorIQ signals
    - Bundled offerings that include:
@@ -205,19 +216,19 @@ For **ecosystem partners**:
 
 ## 9. Cost Structure
 
-- GPU costs:
-  - Nosana GPU-hours for validation, integration, and scaled workloads
-  - Backtesting and simulation runs
-- Infrastructure and dev ops:
-  - Node / RPC costs
-  - Storage (IPFS / object storage)
-  - Monitoring and logging
 - R&D:
-  - Model development and calibration
-  - Backtest pipelines and evaluation
+  - Systems and model development
+  - Backtest pipelines and calibration
 - Business development:
   - Time spent with design partners and accelerators
   - Minimal marketing, focused on technical content and demos
+- GPU costs:
+  - Nosana GPU-hours for validation, integration, and scaled workloads
+  - Backtesting and simulation runs
+- IT / infrastructure:
+  - Node / RPC costs
+  - Storage (IPFS / object storage)
+  - Monitoring and logging
 
 ---
 

@@ -35,11 +35,12 @@ flowchart TD
     
     %% Output to users
     WAP3 -.Completed.-> PA
-    PA --> USERS["<b>Institutional Users</b><br/>External AI Systems<br/><br/>Risk Signals · Alerts"]:::user
+    PA --> INST["<b>Institutional Users</b><br/>External AI Systems / API / MCP<br/><br/>Risk Signals · Alerts"]:::user
     
-    %% Optional AIGC
-    PA -.Optional.-> AIGC["<b>AIGC / UX</b><br/><br/>Human-readable<br/>briefings"]:::user
-    AIGC --> USERS
+    %% AIGC/UX for individual users
+    PA --> AIGC["<b>AIGC / UX</b><br/><br/>Human-readable<br/>briefings"]:::user
+    AIGC --> INST
+    AIGC --> INDIV["<b>Individual Users</b><br/><br/>Onboarded · Edge · Alerts"]:::user
 ```
 
 ---
