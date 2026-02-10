@@ -1,5 +1,44 @@
 # WAP3 + PredictorIQ – Business Model Canvas
 
+```mermaid
+%%{init: {'theme':'base', 'themeVariables': { 'fontSize':'15px'}}}%%
+graph TB
+    subgraph TOP[" "]
+        direction LR
+        KP["<b>KEY PARTNERS</b><br/><br/>• NEC X! (co-marketing, MVP)<br/>• Sui & Walrus (infra)<br/>• ChainGPT (Web3 LLM/UX)<br/>• Nosana (GPU Market)<br/>• Prediction markets<br/>• LangGraph"]
+        KA["<b>KEY ACTIVITIES</b><br/><br/>• Build & launch PredictorIQ<br/>• Operate WAP3<br/>• MVP refinement & GTM/sales planning with NEC X!<br/>• Web3 UX with ChainGPT<br/>• Run GPU workflows"]
+        KR["<b>KEY RESOURCES</b><br/><br/>• WAP3 core<br/>• Sui & Walrus infra<br/>• NEC X! partnership<br/>• PredictorIQ stack<br/>• Nosana integration<br/>• ChainGPT partnership<br/>• Team expertise"]
+    end
+    
+    subgraph MID[" "]
+        direction LR
+        VP["<b>VALUE PROPOSITIONS</b><br/><br/><b>AI/Agent Builders:</b><br/>• Agent payment & escrow<br/>• Verifiable execution<br/>• Reference vertical<br/><br/><b>Institutional:</b><br/>• Probability shift detection<br/>• Explainable signals"]
+        CH["<b>CHANNELS</b><br/><br/>• Direct outreach<br/>• Design programs<br/>• Web3/AI grants<br/>• Tech communities"]
+    end
+    
+    subgraph CUST[" "]
+        CS["<b>CUSTOMER SEGMENTS</b><br/><br/>• AI/Agent builders & Web3 teams<br/>• Institutional users<br/>• Advanced traders (later)<br/>• Prediction market platforms<br/>• Ecosystem partners"]
+    end
+    
+    subgraph FIN[" "]
+        direction LR
+        COST["<b>COST STRUCTURE</b><br/><br/>• GPU costs (Nosana)<br/>• Infrastructure<br/>• R&D (models, backtests)<br/>• Business dev"]
+        REV["<b>REVENUE STREAMS</b><br/><br/><b>Primary (WAP3):</b><br/>• Usage-based fees<br/><br/><b>Secondary:</b><br/>• Subscriptions<br/><br/><b>Long-term:</b><br/>• Enterprise"]
+    end
+    
+    classDef infra fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
+    classDef value fill:#1976d2,stroke:#0d47a1,stroke-width:3px,color:#fff
+    classDef customer fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    classDef financial fill:#e8f5e9,stroke:#388e3c,stroke-width:2px
+    
+    class KP,KA,KR infra
+    class VP value
+    class CH,CS customer
+    class COST,REV financial
+```
+
+---
+
 This canvas describes the business model for the current WAP3 + PredictorIQ stack, aligned with the internal product and architecture docs.
 
 ---
@@ -21,16 +60,21 @@ This canvas describes the business model for the current WAP3 + PredictorIQ stac
 
 Primary segments:
 
+- **AI / Agent system builders and Web3 infra teams**
+  - Teams deploying agent-based workflows (LangGraph, tool-using LLMs, internal orchestration)
+  - Need agent-native payment, settlement, and audit layers
+  - Web3 infrastructure teams building multi-agent systems
+
 - **Institutional users**
   - Funds, trading desks, risk teams
   - Policy / research organizations
   - Infrastructure and operations teams needing early risk signals
 
-- **AI / Agent system builders**
-  - Teams deploying agent-based workflows (LangGraph, tool-using LLMs, internal orchestration)
-  - Need agent-native payment, settlement, and audit layers
+- **Advanced individual users / traders** (later, via PredictorIQ frontends)
+  - Sophisticated traders seeking market quality insights
+  - Users wanting structural anomaly alerts
 
-Secondary segments (future):
+Secondary segments:
 
 - **Prediction market platforms**
   - Potential integration partners for data and co-marketing
@@ -43,19 +87,24 @@ Secondary segments (future):
 
 ## 3. Value Propositions
 
+For **AI / Agent system builders** (Web3 first):
+
+- Agent-native payment and programmable escrow
+- Verifiable execution and provenance for multi-agent workflows
+- A reference vertical (PredictorIQ) that proves the pattern
+
 For **institutional users**:
 
 - Early detection of probability shifts around high-impact events
-- Explainable, auditable risk signals (price quality + wallet quality), not just raw prices
-- Ability to integrate signals into internal dashboards, models, or agent systems
+- Explainable risk signals (price quality + wallet quality)
+- Integration into dashboards, models, or internal agents
 
-For **AI / agent system builders**:
+For **advanced individual users** (later):
 
-- Agent-native payment and settlement (micro-payments, escrow, AP2 + X402)
-- Verifiable execution and provenance for multi-agent workflows
-- Reference vertical (PredictorIQ) that demonstrates real-world usage and scale
+- Cleaner views of market quality and wallet quality
+- Alerts for structural anomalies
 
-For **ecosystem partners (Nosana, prediction markets)**:
+For **ecosystem partners**:
 
 - Steady usage of GPU workloads from market analysis and backtests
 - Higher-value use case demonstrating the power of prediction markets beyond speculation
@@ -64,18 +113,9 @@ For **ecosystem partners (Nosana, prediction markets)**:
 
 ## 4. Key Activities
 
-- Maintain and improve **PredictorIQ**:
-  - Price quality models
-  - Wallet quality and anomaly detection
-  - Cross-market aggregation and event grouping
-- Operate and harden **WAP3**:
-  - Escrow, AP2, X402 triggers
-  - Payment and settlement logic
-  - Audit and provenance tooling
-- Run **GPU-intensive workflows**:
-  - Historical backtests
-  - Embeddings, clustering, similarity analysis
-  - Regime-shift and anomaly simulations
+- Maintain **PredictorIQ** (price quality, wallet quality, anomaly detection)
+- Operate **WAP3** (escrow, payment, audit / provenance)
+- Run **GPU workflows** (backtests, embeddings, simulations)
 - Work with **design partners**:
   - Institutional users piloting risk signals
   - Agent framework builders integrating WAP3
@@ -139,22 +179,25 @@ For **ecosystem partners (Nosana, prediction markets)**:
 
 ## 8. Revenue Streams
 
-Near-term (post-grant):
+**Web3 / WAP3 usage (primary)**:
 
-1. **Usage-based fees** for agent workloads
+1. **Usage-based fees** for agent workloads executed via WAP3
    - Billing tied to WAP3 usage and compute consumption
    - Pass-through of GPU costs plus a margin
+   - Applies to any agent workflow using WAP3 (not just PredictorIQ)
 
-2. **Subscription tiers** for institutional users
+**PredictorIQ vertical (secondary)**:
+
+2. **Subscription tiers** for institutional access to PredictorIQ signals
    - Bundled offerings that include:
      - Allocated Nosana compute
      - Market access limits (venues, number of markets)
      - Features (dashboards, APIs, alerting)
      - Support and SLAs
 
-Longer-term:
+**Longer-term**:
 
-- Enterprise deployments of WAP3 + PredictorIQ as an internal system:
+- Enterprise deployments of WAP3 + PredictorIQ as internal systems:
   - Flat or tiered licensing
   - Hybrid on-prem / cloud architectures
 

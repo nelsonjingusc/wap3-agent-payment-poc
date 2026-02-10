@@ -1,5 +1,32 @@
 # WAP3 + PredictorIQ Product Overview
 
+## Product Overview Diagram
+
+```mermaid
+flowchart TB
+    Markets[Prediction Markets<br/>Polymarket · Kalshi · Limitless]
+    
+    Markets --> Agents[PredictorIQ Agents<br/>Option Pricing · Market Similarity<br/>Wallet Quality · Anomaly Detection]
+    
+    Agents -->|Task + Payment| WAP3[WAP3 Core<br/>Web3 Agent Payment & Escrow Layer<br/><br/>Receives tasks from PredictorIQ<br/>Locks funds in escrow<br/>Routes to execution layer<br/>Settles on verifiable completion]
+    
+    WAP3 --> Nosana[Nosana GPU Network<br/>Primary execution backend<br/><br/>Monte Carlo simulations<br/>Vector embeddings<br/>Backtesting]
+    
+    Nosana -->|Results via IPFS hash| WAP3
+    
+    WAP3 -->|Completed| Agents
+    
+    Agents --> Users[Users & Output<br/><br/>Institutional: Funds, risk teams<br/>Future: Individual traders]
+    
+    style WAP3 fill:#1f6feb,stroke:#0b3d91,color:#fff,stroke-width:3px
+```
+
+**Grant & Revenue Notes:**
+- ~50% of grant → Nosana GPU credits (13k–15k GPU hours over 6 months)
+- Post-grant: Usage fees + subscription tiers
+
+---
+
 ## Core Concept
 
 WAP3 is an agent-native payment, escrow and provenance layer that coordinates GPU compute on Nosana with deterministic settlement based on verifiable execution results.

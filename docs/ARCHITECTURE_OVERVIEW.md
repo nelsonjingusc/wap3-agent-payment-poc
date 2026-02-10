@@ -4,6 +4,46 @@ Technical companion to product overview. Explains system structure, Nosana integ
 
 ---
 
+## Architecture Diagram
+
+```mermaid
+%%{init: {'theme':'base', 'themeVariables': { 'fontSize':'18px', 'fontFamily':'arial'}}}%%
+flowchart TD
+    %% Define styles
+    classDef product fill:#e3f2fd,stroke:#1976d2,stroke-width:2px,color:#000
+    classDef wap3 fill:#1976d2,stroke:#0d47a1,stroke-width:3px,color:#fff
+    classDef infra fill:#fff3e0,stroke:#f57c00,stroke-width:2px,color:#000
+    classDef user fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#000
+    
+    %% Top Layer
+    PM["<b>Prediction Markets<br/>& Wallet Data</b>"]:::product
+    
+    PM --> PA["<b>PredictorIQ Agents</b><br/><br/>• Option Pricing<br/>• Wallet Quality<br/>• Anomaly Detection"]:::product
+    
+    %% Middle Layer - WAP3 Core
+    PA -->|Tasks + Payment| WAP3["<b>WAP3 CORE</b><br/>Web3 Agent Payment & Provenance<br/><br/>━━━━━━━━━━━━━━━━━<br/><br/><b>Escrow Engine</b><br/>AP2 + X402<br/><br/><b>Payment & Settlement</b><br/>Micro-payments between agents<br/><br/><b>Provenance & Audit Log</b><br/>Who · What · Where · Why"]:::wap3
+    
+    %% Bottom Layer - Infrastructure
+    WAP3 --> NOSANA["<b>Nosana GPU Network</b><br/><br/>Embeddings · Backtests<br/>Clustering · Simulations"]:::infra
+    WAP3 --> CHAIN["<b>Sui Blockchain</b><br/><br/>Smart Contracts<br/>Escrow Release"]:::infra
+    WAP3 --> STORE["<b>Walrus Storage</b><br/><br/>Decentralized Storage<br/>Job Results · Proofs · Audit"]:::infra
+    
+    %% Return flows
+    NOSANA -.Results.-> WAP3
+    CHAIN -.Settlement.-> WAP3
+    STORE -.Proofs.-> WAP3
+    
+    %% Output to users
+    WAP3 -.Completed.-> PA
+    PA --> USERS["<b>Institutional Users</b><br/>External AI Systems<br/><br/>Risk Signals · Alerts"]:::user
+    
+    %% Optional AIGC
+    PA -.Optional.-> AIGC["<b>AIGC / UX</b><br/><br/>Human-readable<br/>briefings"]:::user
+    AIGC --> USERS
+```
+
+---
+
 ## Component Stack
 
 Three main layers:
