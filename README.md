@@ -1,6 +1,8 @@
-# GioroX AI, Inc.
+# WAP3 — Agent Payment & Provenance Layer
 
-**Building the programmable financial layer for the Agent Economy.**
+**Programmable settlement, verifiable execution, and provenance for autonomous agents.**
+
+WAP3 is the infrastructure layer that enables AI agents to coordinate, transact, and record trustable execution histories across Web3 ecosystems. This repository contains the core protocol, smart contracts, and demo tooling.
 
 ---
 
@@ -43,15 +45,35 @@ MVP:AUDIT_JSON=demo/out/session_*/audit.json
 
 ---
 
+## Project Overview
+
+WAP3 is a foundational protocol, not a single vertical application. It provides a reusable substrate for agentic systems that need micro-payments, proof-based verification, and auditable coordination.
+
+**Layering model:**
+- **Infrastructure layer (WAP3):** agent payments, escrow, and provenance
+- **Intelligence layer (vertical apps):** domain-specific logic built on top of WAP3
+- **Presentation layer (optional):** human-readable reports or briefings generated from intelligence outputs
+
+---
+
+## Vertical Application: PredictorIQ
+
+PredictorIQ is a vertical intelligence application built on WAP3. It treats prediction markets as a distributed sensing layer and extracts **structured risk signals** rather than trading recommendations.
+
+**Core ideas:**
+- **Price quality:** whether market prices contain meaningful information or noise
+- **Wallet quality:** who is driving the market and their historical accuracy
+- **Signal synthesis:** explainable risk indicators with confidence metrics
+
+PredictorIQ is one example of how WAP3 can power domain-specific intelligence products while keeping the infrastructure reusable for other verticals.
+
+---
+
 ## About Us
 
 ### **GIOROX AI, INC.**
 
-**Building the programmable financial layer for the Agent Economy.**
-
-GioroX AI, Inc. is building the infrastructure that enables autonomous AI agents to transact, verify, and collaborate securely across Web3 ecosystems—without human intervention.
-
-We're creating a new economic paradigm where AI agents can discover work, complete tasks, prove execution, and settle payments entirely on-chain. Our programmable settlement and escrow protocols unlock true agent autonomy by providing trustless, cryptographic guarantees for AI-to-AI commerce.
+GioroX AI, Inc. is building the programmable financial layer for the Agent Economy. Our focus is enabling autonomous agents to transact, verify, and collaborate securely without human intervention.
 
 ---
 
@@ -59,7 +81,7 @@ We're creating a new economic paradigm where AI agents can discover work, comple
 
 The future of AI is autonomous, and autonomy requires economic independence.
 
-Traditional payment systems (Stripe, PayPal, bank transfers) were designed for humans and fail to meet the requirements of AI-to-AI commerce:
+Traditional payment systems were designed for humans and fail to meet the requirements of AI-to-AI commerce:
 
 - ❌ Too slow (days vs. milliseconds)
 - ❌ Too expensive for micro-transactions ($0.30 + 2.9% per transaction)
@@ -67,7 +89,7 @@ Traditional payment systems (Stripe, PayPal, bank transfers) were designed for h
 - ❌ No cryptographic proof of work completion
 - ❌ Centralized intermediaries
 
-**GioroX AI provides:**
+**WAP3 provides:**
 
 - ✅ **Programmable escrow** on-chain with smart contract automation
 - ✅ **Proof-based verification** via decentralized storage (Walrus, IPFS)
@@ -114,6 +136,43 @@ WAP3 enables autonomous AI agents to transact, verify, and collaborate securely 
 
 ## 🏗️ Architecture
 
+### System Architecture (WAP3 + Partners + Integrations)
+
+```mermaid
+flowchart TD
+  %% Color theme: bright orange/yellow + blue
+  classDef core fill:#1f6feb,stroke:#0b3d91,color:#ffffff,stroke-width:3px;
+  classDef execution fill:#cfe8ff,stroke:#1f6feb,color:#0b3d91,stroke-width:2px;
+  classDef verification fill:#ffd56a,stroke:#cc8a00,color:#1a1a1a,stroke-width:2px;
+  classDef partner fill:#ffe08a,stroke:#cc8a00,color:#1a1a1a,stroke-width:2px;
+  classDef llm fill:#cfe8ff,stroke:#1f6feb,color:#0b3d91,stroke-width:2px;
+  classDef app fill:#66b3ff,stroke:#1f6feb,color:#0b3d91,stroke-width:2px;
+  classDef appHighlight fill:#ffb000,stroke:#cc7a00,color:#1a1a1a,stroke-width:3px;
+
+  %% Vertical Apps Layer
+  PI[Vertical Application<br/>PredictorIQ - Prediction Market Intelligence]:::appHighlight
+  
+  %% Agent Layer
+  PI -->|Strategy signals| AGENT[Agent Orchestrator]:::app
+  
+  %% Core Protocol
+  AGENT -->|Task intent + escrow| WAP3[WAP3 Core Protocol<br/>Payment · Escrow · Provenance]:::core
+  
+  %% Execution Layer
+  WAP3 -->|GPU jobs<br/>Historical data backtesting| NOSANA[Nosana<br/>GPU Execution Layer]:::execution
+  
+  %% Web3 LLM Layer
+  WAP3 -->|Web3 education<br/>Domain onboarding| CGPT[ChainGPT<br/>AgenticOS + Web3 LLM]:::llm
+  
+  %% Verification & Settlement Layer
+  WAP3 -->|Proof verification| WALRUS[Walrus<br/>Decentralized Storage]:::verification
+  WAP3 -->|Smart contracts<br/>Fund release| SUI[Sui Blockchain<br/>Settlement Layer]:::verification
+```
+
+**Architecture Notes:**
+- **Partners**: Sui and Walrus (current infrastructure partners for settlement and verification)
+- **In Discussion**: Nosana (GPU execution for historical data backtesting) and ChainGPT (AgenticOS + Web3 LLM for onboarding users to Web3 prediction markets)
+
 ### Core Components
 
 - **Smart Contract** (`contracts/AgentEscrow.sol`) - On-chain escrow and settlement
@@ -126,22 +185,22 @@ WAP3 enables autonomous AI agents to transact, verify, and collaborate securely 
 ```
 1. Intent Creation (AP2)
    └─> Buyer creates task intent
-   
+
 2. Payment Trigger (X402)
    └─> Payment conditions defined
-   
+
 3. Escrow Creation
    └─> Funds locked on-chain
-   
+
 4. Task Execution
    └─> Agent executes work
-   
+
 5. Proof Submission
    └─> Cryptographic proof stored
-   
+
 6. Settlement
    └─> Payment released automatically
-   
+
 7. Audit
    └─> Complete transaction record
 ```
@@ -291,7 +350,3 @@ MIT License - see [LICENSE](LICENSE) file
 **GioroX AI, Inc.** - Building the programmable financial layer for the Agent Economy.
 
 For more information, visit our [Technical Documentation](TECHNICAL.md).
-
----
-
-**Built with ❤️ by GioroX AI, Inc.**
