@@ -36,8 +36,8 @@ lerna-debug.log*
 # Misc
 .cache
 
-# Internal documentation (not for public repo)
-docs/internal/
+# Archive (historical docs)
+docs/archive/
 
 # Demo output files (generated at runtime)
 demo/out/
