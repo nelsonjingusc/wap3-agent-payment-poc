@@ -78,7 +78,7 @@ class WAP3,NEL bigTitle;
 %%{init: {
   "theme": "base",
   "themeVariables": {
-    "fontSize": "16px",
+    "fontSize": "13px",
     "fontFamily": "Inter, system-ui, sans-serif"
   }
 }}%%
