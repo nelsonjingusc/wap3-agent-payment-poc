@@ -94,7 +94,7 @@ flowchart TB
     end
 
     subgraph EXEC["🔌  EXECUTION LAYER"]
-        I["<br/>─────────────<br/>submit() · waitForCompletion()"]
+        I["submit() <br/>─────────────<br/> waitForCompletion()"]
     end
 
     subgraph NOS["⚡ NOSANA SDK"]
