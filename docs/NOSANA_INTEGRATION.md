@@ -93,8 +93,8 @@ flowchart TB
         A1 -->|"payment trigger"| A2
     end
 
-    subgraph EXEC["🔌  EXECUTION ABSTRACTION"]
-        I["ExecutionLayer Interface<br/>─────────────<br/>submit() · waitForCompletion()"]
+    subgraph EXEC["🔌  EXECUTION"]
+        I["Execution Layer<br/>─────────────<br/>submit() · waitForCompletion()"]
     end
 
     subgraph NOS["⚡ NOSANA SDK"]
