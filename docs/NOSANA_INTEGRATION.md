@@ -89,6 +89,7 @@ flowchart TB
 %% =====================
 subgraph APP["🤖  WAP3 "]
     direction TB
+    APP_T["🤖  WAP3"]
     A1["AP2 Intent
 Task · Budget · Requirements"]
     A2["WAP3 Escrow
@@ -123,7 +124,7 @@ end
 %% =====================
 %% NETWORK (FORCED HORIZONTAL)
 %% =====================
-subgraph NET["NETWORK"]
+subgraph NET["NOSANA NETWORK"]
     direction LR
     G["GPU Nodes
 Decentralized compute"]
