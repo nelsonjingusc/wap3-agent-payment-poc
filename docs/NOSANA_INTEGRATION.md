@@ -9,65 +9,59 @@ WAP3 uses **Nosana as the primary and default GPU execution backend** for all AI
 ## Product Overview
 
 ```mermaid
-%%{init: {
-  "theme": "base",
-  "themeVariables": {
-    "primaryColor": "#FFFFFF",
-    "primaryTextColor": "#000000",
-    "primaryBorderColor": "#000000",
-    "lineColor": "#000000",
-    "fontSize": "32px",
-    "fontFamily": "Inter, system-ui, sans-serif"
-  }
-}}%%
 flowchart TB
-    linkStyle default stroke-width:5px,fill:none,stroke:black,color:black,stroke:black
 
-    subgraph NOS_LAYER ["Nosana-Powered Execution Layer"]
-        direction LR
-        ND("dispatch job<br/>─────────────<br/>jobs.post() · market · ipfsHash")
-        
-        subgraph GPU_WORKLOADS ["GPU Workloads"]
-            direction TB
-            N1("Market Matching<br/>─────────────<br/>Embedding + similarity")
-            N2("News Digest<br/>─────────────<br/>Fetch → LLM summarize")
-            N3("Outcome Pricing<br/>─────────────<br/>Monte Carlo · probability")
-            N4("Agent Signals<br/>─────────────<br/>Scenario simulation")
-        end
+%% =========================
+%% Top: WAP3 Layer
+%% =========================
+subgraph WAP3["WAP3 Layer"]
+direction LR
 
-        NI("IPFS result<br/>─────────────<br/>ipfs.retrieve() · proof hash")
+E["<b>Escrow</b><br/>────────────<br/>Lock ・ release ・ refund funds"]:::wap3box
+P["<b>AP2 / X402</b><br/>────────────<br/>Agent payment protocol"]:::wap3box
+S["<b>Settlement Rules</b><br/>────────────<br/>Condition-based fund release"]:::wap3box
+R["<b>Provenance Record</b><br/>────────────<br/>Agent ・ job ・ result ・ reason"]:::wap3box
 
-        ND ==> GPU_WORKLOADS
-        GPU_WORKLOADS ==> NI
-    end
+end
+style WAP3 fill:#e8f4ff,stroke:#2f6fd6,stroke-width:3px,rx:6,ry:6
 
-    subgraph WAP3_LAYER ["WAP3"]
-        direction TB
-        W1("Escrow<br/>─────────────<br/>Lock · release · refund funds")
-        W2("AP2 / X402<br/>─────────────<br/>Agent payment protocol")
-        W3("Settlement Rules<br/>─────────────<br/>Condition-based fund release")
-        W4("Provenance Record<br/>─────────────<br/>Agent · job · result · reason")
-    end
+%% =========================
+%% Bottom: Nosana Execution Layer
+%% =========================
+subgraph NOS["Nosana Execution Layer"]
+direction TB
 
-    %% Connect the layers
-    %% WAP3 (Bottom) initiates the process upwards to Nosana (Top)
-    WAP3_LAYER ==>|dispatch job + lock funds| NOS_LAYER
-    
-    %% Nosana (Top) returns the result downwards to WAP3 (Bottom)
-    NOS_LAYER ==>|job id + proof hash| WAP3_LAYER
+DJ["<b>dispatch job</b><br/>────────────<br/>jobs.post() ・ market ・ ipfsHash"]:::dashedBox
 
-    %% Styling
-    style NOS_LAYER  fill:#E8F5E9,stroke:#2E7D32,stroke-width:6px,color:#1B5E20,font-size:48px,font-weight:bold
-    style WAP3_LAYER fill:#E3F2FD,stroke:#1565C0,stroke-width:6px,color:#0D47A1,font-size:48px,font-weight:bold
-    style GPU_WORKLOADS fill:#FFFFFF,stroke:none,color:#000000,font-size:32px
+subgraph GPU["GPU Workloads"]
+direction LR
+MM["<b>Market Matching</b><br/>────────────<br/>Embedding + similarity"]:::gpuBox
+ND["<b>News Digest</b><br/>────────────<br/>Fetch → LLM summarize"]:::gpuBox
+OP["<b>Outcome Pricing</b><br/>────────────<br/>Monte Carlo ・ probability"]:::gpuBox
+AS["<b>Agent Signals</b><br/>────────────<br/>Scenario simulation"]:::gpuBox
+end
+style GPU fill:#ffffff00,stroke:#2e7d32,stroke-width:2px,stroke-dasharray:6 4,rx:6,ry:6
 
-    classDef wap3Node fill:#FFFFFF,stroke:#1565C0,stroke-width:4px,color:#000000,rx:12,ry:12,font-weight:bold,font-size:32px,padding:25px
-    classDef nosNode  fill:#FFFFFF,stroke:#2E7D32,stroke-width:4px,color:#000000,rx:12,ry:12,font-weight:bold,font-size:32px,padding:25px
-    classDef ioNode   fill:#FFFFFF,stroke:#000000,stroke-width:4px,stroke-dasharray: 8 8,color:#000000,rx:12,ry:12,font-weight:bold,font-size:32px,padding:25px
+IPFS["<b>IPFS result</b><br/>────────────<br/>ipfs.retrieve() ・ proof hash"]:::dashedBox
 
-    class W1,W2,W3,W4 wap3Node
-    class N1,N2,N3,N4 nosNode
-    class ND,NI ioNode
+DJ --> GPU
+GPU --> IPFS
+
+end
+style NOS fill:#e9f6ea,stroke:#2e7d32,stroke-width:3px,rx:6,ry:6
+
+%% =========================
+%% Cross-layer arrows + labels
+%% =========================
+P -->|"dispatch job + lock funds"| DJ
+IPFS -->|"job id + proof hash"| S
+
+%% =========================
+%% Styles
+%% =========================
+classDef wap3box fill:#ffffff,stroke:#2f6fd6,stroke-width:2px,rx:10,ry:10,color:#111;
+classDef gpuBox fill:#ffffff,stroke:#2e7d32,stroke-width:2px,rx:10,ry:10,color:#111;
+classDef dashedBox fill:#ffffff,stroke:#111,stroke-width:2px,stroke-dasharray:6 4,rx:10,ry:10,color:#111;
 ```
 
 ---
