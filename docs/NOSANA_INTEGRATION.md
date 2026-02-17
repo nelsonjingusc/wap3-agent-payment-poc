@@ -78,59 +78,94 @@ class WAP3,NEL bigTitle;
 %%{init: {
   "theme": "base",
   "themeVariables": {
-    "primaryColor": "#0288D1",
-    "primaryTextColor": "#FFFFFF",
-    "primaryBorderColor": "#01579B",
-    "lineColor": "#4FC3F7",
-    "fontFamily": "Inter, system-ui, sans-serif",
-    "fontSize": "18px"
+    "fontSize": "16px",
+    "fontFamily": "Inter, system-ui, sans-serif"
   }
 }}%%
 flowchart TB
-    subgraph APP["🤖  WAP3 APPLICATION"]
-        A1["AP2 Intent<br/>Task · Budget · Requirements"]
-        A2["WAP3 Escrow
-        
-        Funds locked on-chain"]
-        A1 -->|"payment trigger"| A2
-    end
 
-    subgraph EXEC["🔌  EXECUTION LAYER"]
-        I["submit() <br/>─────────────<br/> waitForCompletion()"]
-    end
+%% =====================
+%% WAP3 APPLICATION
+%% =====================
+subgraph APP["🤖  WAP3 APPLICATION"]
+    direction TB
+    A1["AP2 Intent
+Task · Budget · Requirements"]
+    A2["WAP3 Escrow
+Funds locked on-chain"]
+    A1 -->|"payment trigger"| A2
+end
 
-    subgraph NOS["⚡ NOSANA SDK"]
-        N1["ipfs.pin()<br/>─────────────<br/>Job definition → IPFS"]
-        N2["jobs.post()<br/>─────────────<br/>market · ipfsHash"]
-        N3["jobs.monitor()<br/>─────────────<br/>State transitions stream"]
-        N4["ipfs.retrieve()<br/>─────────────<br/>Output JSON result"]
-        N1 --> N2 --> N3 --> N4
-    end
+%% =====================
+%% EXECUTION LAYER
+%% =====================
+subgraph EXEC["🔌  EXECUTION LAYER"]
+    I["submit()
+waitForCompletion()"]
+end
 
-    subgraph NET["🖥️  NOSANA NETWORK"]
-        G["GPU Nodes<br/>─────────────<br/>Decentralized compute"]
-        H["IPFS<br/>─────────────<br/>Content-addressed storage"]
-    end
+%% =====================
+%% NOSANA SDK (FORCED HORIZONTAL)
+%% =====================
+subgraph NOS["⚡ NOSANA SDK"]
+    direction LR
+    N1["ipfs.pin()
+Job definition → IPFS"]
+    N2["jobs.post()
+market · ipfsHash"]
+    N3["jobs.monitor()
+State transitions stream"]
+    N4["ipfs.retrieve()
+Output JSON result"]
+    N1 --> N2 --> N3 --> N4
+end
 
-    A2 --> I --> N1
-    N4 -->|"ResultEnvelope → proof hash"| A2
-    N2 -.->|"dispatches to"| G
-    N4 -.->|"reads from"| H
+%% =====================
+%% NETWORK (FORCED HORIZONTAL)
+%% =====================
+subgraph NET["🖥️  NOSANA NETWORK"]
+    direction LR
+    G["GPU Nodes
+Decentralized compute"]
+    H["IPFS
+Content-addressed storage"]
+end
 
-    classDef appNode fill:#29B6F6,stroke:#0277BD,color:#FFFFFF,font-size:17px,font-weight:bold
-    classDef ifaceNode fill:#4DB6AC,stroke:#00796B,color:#FFFFFF,font-size:17px,font-weight:bold
-    classDef nosNode fill:#FFB300,stroke:#E65100,color:#1A0A00,font-size:17px,font-weight:bold
-    classDef netNode fill:#66BB6A,stroke:#2E7D32,color:#0A2A0A,font-size:17px,font-weight:bold
+%% =====================
+%% FLOWS
+%% =====================
+A2 --> I --> N1
+N4 -->|"ResultEnvelope → proof hash"| A2
+N2 -.->|"dispatches to"| G
+N4 -.->|"reads from"| H
 
-    class A1,A2 appNode
-    class I ifaceNode
-    class N1,N2,N3,N4 nosNode
-    class G,H netNode
+%% =====================
+%% COLORS
+%% =====================
+%% Big boxes
+style APP fill:#E1F5FE,stroke:#0288D1,stroke-width:2px
+style EXEC fill:#E0F2F1,stroke:#00796B,stroke-width:2px
+style NOS fill:#FFF8E1,stroke:#FFB300,stroke-width:2px
+style NET fill:#E8F5E9,stroke:#43A047,stroke-width:2px
 
-    style APP fill:#E1F5FE,stroke:#0288D1,color:#003050,font-size:16px
-    style EXEC fill:#E0F2F1,stroke:#00796B,color:#003050,font-size:16px
-    style NOS fill:#FFF8E1,stroke:#FFB300,color:#3E2000,font-size:16px
-    style NET fill:#E8F5E9,stroke:#43A047,color:#0A2A0A,font-size:16px
+%% Small boxes - matching tones
+
+%% WAP3 blue family
+style A1 fill:#29B6F6,stroke:#0277BD,color:#FFFFFF
+style A2 fill:#29B6F6,stroke:#0277BD,color:#FFFFFF
+
+%% Execution teal family
+style I fill:#4DB6AC,stroke:#00796B,color:#FFFFFF
+
+%% Nosana orange family
+style N1 fill:#FFB300,stroke:#E65100,color:#1A0A00
+style N2 fill:#FFB300,stroke:#E65100,color:#1A0A00
+style N3 fill:#FFB300,stroke:#E65100,color:#1A0A00
+style N4 fill:#FFB300,stroke:#E65100,color:#1A0A00
+
+%% Network green family
+style G fill:#66BB6A,stroke:#2E7D32,color:#0A2A0A
+style H fill:#66BB6A,stroke:#2E7D32,color:#0A2A0A
 ```
 
 ---
