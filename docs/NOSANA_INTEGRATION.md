@@ -9,59 +9,65 @@ WAP3 uses **Nosana as the primary and default GPU execution backend** for all AI
 ## Product Overview
 
 ```mermaid
-flowchart TB
+flowchart LR
 
 %% =========================
-%% Top: WAP3 Layer
+%% NOSANA EXECUTION LAYER (LEFT)
 %% =========================
-subgraph WAP3["WAP3 Layer"]
+subgraph NEL["Nosana Execution Layer"]
 direction LR
 
-E["<b>Escrow</b><br/>────────────<br/>Lock ・ release ・ refund funds"]:::wap3box
-P["<b>AP2 / X402</b><br/>────────────<br/>Agent payment protocol"]:::wap3box
-S["<b>Settlement Rules</b><br/>────────────<br/>Condition-based fund release"]:::wap3box
-R["<b>Provenance Record</b><br/>────────────<br/>Agent ・ job ・ result ・ reason"]:::wap3box
+anchor(( ))
 
-end
-style WAP3 fill:#e8f4ff,stroke:#2f6fd6,stroke-width:3px,rx:6,ry:6
-
-%% =========================
-%% Bottom: Nosana Execution Layer
-%% =========================
-subgraph NOS["Nosana Execution Layer"]
-direction TB
-
-DJ["<b>dispatch job</b><br/>────────────<br/>jobs.post() ・ market ・ ipfsHash"]:::dashedBox
+DJ["dispatch job<br>jobs_post - market - ipfsHash"]
 
 subgraph GPU["GPU Workloads"]
 direction LR
-MM["<b>Market Matching</b><br/>────────────<br/>Embedding + similarity"]:::gpuBox
-ND["<b>News Digest</b><br/>────────────<br/>Fetch → LLM summarize"]:::gpuBox
-OP["<b>Outcome Pricing</b><br/>────────────<br/>Monte Carlo ・ probability"]:::gpuBox
-AS["<b>Agent Signals</b><br/>────────────<br/>Scenario simulation"]:::gpuBox
+
+MM["Market Matching<br>Embedding + similarity"]
+ND["News Digest<br>Fetch -> LLM summarize"]
+OP["Outcome Pricing<br>Monte Carlo - probability"]
+AS["Agent Signals<br>Scenario simulation"]
+
 end
-style GPU fill:#ffffff00,stroke:#2e7d32,stroke-width:2px,stroke-dasharray:6 4,rx:6,ry:6
 
-IPFS["<b>IPFS result</b><br/>────────────<br/>ipfs.retrieve() ・ proof hash"]:::dashedBox
+IPFS["IPFS result<br>ipfs_retrieve - proof hash"]
 
+anchor --- DJ
 DJ --> GPU
 GPU --> IPFS
 
 end
-style NOS fill:#e9f6ea,stroke:#2e7d32,stroke-width:3px,rx:6,ry:6
 
 %% =========================
-%% Cross-layer arrows + labels
+%% WAP3 LAYER (RIGHT)
 %% =========================
-P -->|"dispatch job + lock funds"| DJ
-IPFS -->|"job id + proof hash"| S
+subgraph WAP3["WAP3 Layer"]
+direction LR
+
+E["Escrow<br>Lock - release - refund funds"]
+AP["AP2 / X402<br>Agent payment protocol"]
+SR["Settlement Rules<br>Condition-based fund release"]
+PR["Provenance Record<br>Agent - job - result - reason"]
+
+end
 
 %% =========================
-%% Styles
+%% CROSS LAYER ARROWS
 %% =========================
-classDef wap3box fill:#ffffff,stroke:#2f6fd6,stroke-width:2px,rx:10,ry:10,color:#111;
-classDef gpuBox fill:#ffffff,stroke:#2e7d32,stroke-width:2px,rx:10,ry:10,color:#111;
-classDef dashedBox fill:#ffffff,stroke:#111,stroke-width:2px,stroke-dasharray:6 4,rx:10,ry:10,color:#111;
+E -->|"dispatch job + lock funds"| DJ
+DJ -->|"job id + proof hash"| SR
+IPFS --> PR
+
+%% =========================
+%% STYLING
+%% =========================
+style WAP3 fill:#e6f2ff,stroke:#2b6cb0,stroke-width:2px
+style NEL fill:#e6f9ec,stroke:#2f855a,stroke-width:2px
+style GPU fill:#f0fff4,stroke:#38a169,stroke-dasharray: 5 5
+
+classDef bigTitle font-size:20px,font-weight:bold;
+class WAP3,NEL bigTitle;
 ```
 
 ---
