@@ -97,7 +97,7 @@ flowchart TB
         I["ExecutionLayer Interface<br/>─────────────<br/>submit() · waitForCompletion()"]
     end
 
-    subgraph NOS["⚡  NOSANA PROVIDER  ★ DEFAULT GPU BACKEND"]
+    subgraph NOS["⚡ NOSANA SDK"]
         N1["ipfs.pin()<br/>─────────────<br/>Job definition → IPFS"]
         N2["jobs.post()<br/>─────────────<br/>market · ipfsHash"]
         N3["jobs.monitor()<br/>─────────────<br/>State transitions stream"]
