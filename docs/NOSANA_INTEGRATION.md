@@ -123,8 +123,7 @@ end
 %% =====================
 %% NETWORK (FORCED HORIZONTAL)
 %% =====================
-subgraph NET["NOSANA 
-NETWORK"]
+subgraph NET["NOSANA NETWORK"]
     direction LR
     G["GPU Nodes
 Decentralized compute"]
