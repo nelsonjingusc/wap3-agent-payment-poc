@@ -89,7 +89,9 @@ class WAP3,NEL bigTitle;
 flowchart TB
     subgraph APP["🤖  WAP3 APPLICATION"]
         A1["AP2 Intent<br/>Task · Budget · Requirements"]
-        A2["WAP3 Escrow<br/>Funds locked on-chain"]
+        A2["WAP3 Escrow
+        
+        Funds locked on-chain"]
         A1 -->|"payment trigger"| A2
     end
 
