@@ -1,279 +1,396 @@
-# Nosana Integration - Technical Architecture
+# Nosana Integration — Technical Architecture
 
 ## Overview
 
-This document describes the technical architecture of the Nosana execution layer integration in WAP3. The integration enables autonomous AI agents to submit GPU-enabled containerized tasks to Nosana's decentralized compute network, monitor execution status in real-time, and retrieve results from IPFS.
+WAP3 uses **Nosana as the primary and default GPU execution backend** for all AI-intensive workloads in the launch / pilot phase. This document describes the canonical integration flow, execution architecture, and GPU workload catalog powering the **PredictorIQ** reference vertical.
+
+---
+
+## Product Overview
+
+```mermaid
+%%{init: {
+  "theme": "base",
+  "themeVariables": {
+    "primaryColor": "#1E1E2E",
+    "primaryTextColor": "#CDD6F4",
+    "primaryBorderColor": "#585B70",
+    "lineColor": "#89DCEB",
+    "fontFamily": "Inter, system-ui, sans-serif",
+    "fontSize": "18px",
+    "edgeLabelBackground": "#1E1E2E"
+  }
+}}%%
+flowchart TB
+    subgraph AGENT["🤖  AGENT"]
+        A1["AP2 Intent<br/>─────────────<br/>Task · Budget · Requirements"]
+        A2["X402 Trigger<br/>─────────────<br/>Payment conditions met"]
+        A1 -->|"payment trigger"| A2
+    end
+
+    subgraph ESCROW["🔐  WAP3 ESCROW  (on-chain)"]
+        P1["Lock Funds<br/>─────────────<br/>Funds locked on-chain"]
+        P2["Submit Proof<br/>─────────────<br/>outputHash on-chain"]
+        P3["Release Payment<br/>─────────────<br/>Settled to agent ✓"]
+        P1 --> P2 --> P3
+    end
+
+    subgraph NOSANA["⚡  NOSANA GPU EXECUTION"]
+        N1["① ipfs.pin()<br/>─────────────<br/>Job definition → IPFS"]
+        N2["② jobs.post()<br/>─────────────<br/>market · ipfsHash"]
+        N3["③ jobs.monitor()<br/>─────────────<br/>State transitions stream"]
+        N4["④ ipfs.retrieve()<br/>─────────────<br/>Output JSON result"]
+        N1 --> N2 --> N3 --> N4
+    end
+
+    subgraph WORK["📊  PredictorIQ  GPU Workloads"]
+        W1["Monte Carlo Pricing<br/>─────────────<br/>Risk-neutral probability range"]
+        W2["Market Embeddings<br/>─────────────<br/>Similarity clustering"]
+        W3["Backtest Replay<br/>─────────────<br/>Historical strategy replay"]
+    end
+
+    subgraph SETTLE["✅  SETTLEMENT & AUDIT"]
+        S1["ResultEnvelope<br/>─────────────<br/>Structured output + hash"]
+        S2["Execution Record<br/>─────────────<br/>gpu_hours · metering"]
+        S3["On-chain Provenance<br/>─────────────<br/>Immutable audit trail"]
+        S1 --> S2 --> S3
+    end
+
+    A2     -->|"lock funds"| P1
+    P1     -->|"dispatch"| N1
+    N4     -->|"validate"| S1
+    S2     -->|"proof hash"| P2
+    P3     -->|"log"| S3
+
+    N2 -.->|"runs"| W1
+    N2 -.->|"runs"| W2
+    N2 -.->|"runs"| W3
+
+    classDef agentNode  fill:#F38BA8,stroke:#D20F39,color:#1E1E2E,font-weight:bold
+    classDef escrowNode fill:#89B4FA,stroke:#1E66F5,color:#1E1E2E,font-weight:bold
+    classDef nosNode    fill:#FAB387,stroke:#FE640B,color:#1E1E2E,font-weight:bold
+    classDef workNode   fill:#A6E3A1,stroke:#40A02B,color:#1E1E2E,font-weight:bold
+    classDef settleNode fill:#CBA6F7,stroke:#8839EF,color:#1E1E2E,font-weight:bold
+
+    class A1,A2 agentNode
+    class P1,P2,P3 escrowNode
+    class N1,N2,N3,N4 nosNode
+    class W1,W2,W3 workNode
+    class S1,S2,S3 settleNode
+
+    style AGENT   fill:#2A1A1A,stroke:#F38BA8,color:#F38BA8,font-weight:bold
+    style ESCROW  fill:#1A1A2A,stroke:#89B4FA,color:#89B4FA,font-weight:bold
+    style NOSANA  fill:#2A1A00,stroke:#FAB387,color:#FAB387,font-weight:bold
+    style WORK    fill:#1A2A1A,stroke:#A6E3A1,color:#A6E3A1,font-weight:bold
+    style SETTLE  fill:#1E1A2A,stroke:#CBA6F7,color:#CBA6F7,font-weight:bold
+```
 
 ---
 
 ## Architecture Layers
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                    WAP3 Application                     │
-│            (Agent Payment & Escrow System)              │
-└────────────────────┬────────────────────────────────────┘
-                     │
-                     ▼
-┌─────────────────────────────────────────────────────────┐
-│              Execution Layer Abstraction                │
-│     (Provider-agnostic interface for compute)           │
-└────────────────────┬────────────────────────────────────┘
-                     │
-                     ▼
-┌─────────────────────────────────────────────────────────┐
-│            Nosana Execution Layer Provider              │
-│         (Implementation using @nosana/kit SDK)          │
-└────────────────────┬────────────────────────────────────┘
-                     │
-                     ▼
-┌─────────────────────────────────────────────────────────┐
-│                  Nosana Network                         │
-│    (Decentralized GPU compute + IPFS storage)           │
-└─────────────────────────────────────────────────────────┘
+```mermaid
+%%{init: {
+  "theme": "base",
+  "themeVariables": {
+    "primaryColor": "#0288D1",
+    "primaryTextColor": "#FFFFFF",
+    "primaryBorderColor": "#01579B",
+    "lineColor": "#4FC3F7",
+    "fontFamily": "Inter, system-ui, sans-serif",
+    "fontSize": "18px"
+  }
+}}%%
+flowchart TB
+    subgraph APP["🤖  WAP3 APPLICATION"]
+        A1["AP2 Intent<br/>─────────────<br/>Task · Budget · Requirements"]
+        A2["WAP3 Escrow<br/>─────────────<br/>Funds locked on-chain"]
+        A1 -->|"payment trigger"| A2
+    end
+
+    subgraph EXEC["🔌  EXECUTION ABSTRACTION"]
+        I["ExecutionLayer Interface<br/>─────────────<br/>submit() · waitForCompletion()"]
+    end
+
+    subgraph NOS["⚡  NOSANA PROVIDER  ★ DEFAULT GPU BACKEND"]
+        N1["ipfs.pin()<br/>─────────────<br/>Job definition → IPFS"]
+        N2["jobs.post()<br/>─────────────<br/>market · ipfsHash"]
+        N3["jobs.monitor()<br/>─────────────<br/>State transitions stream"]
+        N4["ipfs.retrieve()<br/>─────────────<br/>Output JSON result"]
+        N1 --> N2 --> N3 --> N4
+    end
+
+    subgraph NET["🖥️  NOSANA NETWORK"]
+        G["GPU Nodes<br/>─────────────<br/>Decentralized compute"]
+        H["IPFS<br/>─────────────<br/>Content-addressed storage"]
+    end
+
+    A2 --> I --> N1
+    N4 -->|"ResultEnvelope → proof hash"| A2
+    N2 -.->|"dispatches to"| G
+    N4 -.->|"reads from"| H
+
+    classDef appNode fill:#29B6F6,stroke:#0277BD,color:#FFFFFF,font-size:17px,font-weight:bold
+    classDef ifaceNode fill:#4DB6AC,stroke:#00796B,color:#FFFFFF,font-size:17px,font-weight:bold
+    classDef nosNode fill:#FFB300,stroke:#E65100,color:#1A0A00,font-size:17px,font-weight:bold
+    classDef netNode fill:#66BB6A,stroke:#2E7D32,color:#0A2A0A,font-size:17px,font-weight:bold
+
+    class A1,A2 appNode
+    class I ifaceNode
+    class N1,N2,N3,N4 nosNode
+    class G,H netNode
+
+    style APP fill:#E1F5FE,stroke:#0288D1,color:#003050,font-size:16px
+    style EXEC fill:#E0F2F1,stroke:#00796B,color:#003050,font-size:16px
+    style NOS fill:#FFF8E1,stroke:#FFB300,color:#3E2000,font-size:16px
+    style NET fill:#E8F5E9,stroke:#43A047,color:#0A2A0A,font-size:16px
 ```
 
 ---
 
-## Core Components
+## Canonical SDK Flow
 
-### 1. Execution Layer Interface
+The integration follows the **official `@nosana/kit` workflow** end-to-end:
 
-**File**: `execution/execution-layer.ts`
-
-Defines the contract that all compute providers must implement:
+### Step 1 — Pin Job Definition to IPFS
 
 ```typescript
-interface ExecutionLayer {
-  submit(job: ExecutionJob): Promise<ExecutionReceipt>;
-  waitForCompletion(executionId: string): Promise<ExecutionResult>;
-}
+const { ipfsHash } = await client.ipfs.pin(jobDefinition);
+// jobDefinition is a Nosana v0.1 container job spec (see Job Template System below)
 ```
 
-**Key Types:**
+### Step 2 — Post Job to Market
 
-- `ExecutionJob` - Task specification (type, inputs, model)
-- `ExecutionReceipt` - Submission confirmation with job IDs
-- `ExecutionResult` - Completion status with output and logs
-- `ExecutionStatus` - State enum (SUBMITTED, RUNNING, SUCCEEDED, FAILED)
-
-### 2. Nosana Provider Implementation
-
-**File**: `execution/nosana/nosana-layer.ts`
-
-Implements the execution layer interface using Nosana's SDK.
-
-**Initialization:**
 ```typescript
-const { createNosanaClient, NosanaNetwork } = await import("@nosana/kit");
-this.nosanaClient = createNosanaClient(NosanaNetwork.MAINNET, {
-  api: { apiKey: this.apiKey }
+const jobResponse = await client.jobs.post({
+  market: this.market,       // Nosana market address
+  timeout: 300,              // max execution seconds
+  ipfsHash                   // pinned job definition
 });
+const nosanaJobId = jobResponse.id;
 ```
 
-**Job Submission:**
-```typescript
-const jobResponse = await client.api.jobs.create({
-  market: this.market,
-  jobDefinition: nosanaJobSpec
-});
-```
+### Step 3 — Monitor State Transitions (real-time)
 
-**Event Monitoring:**
 ```typescript
 const [events, stop] = await client.jobs.monitor();
 for await (const event of events) {
-  if (event?.data?.id === targetJobId) {
-    // Process state changes
+  if (event?.data?.id !== nosanaJobId) continue;
+
+  const state = event?.data?.state;
+  console.log(`[nosana][trace=${executionId}] state=${state}`);
+
+  if (["done", "completed", "success"].includes(state)) {
+    const ipfsResult = event?.data?.ipfsResult;
+    // proceed to Step 4
+    stop();
+    break;
+  }
+  if (["stopped", "failed", "error"].includes(state)) {
+    stop();
+    throw new Error(`Job failed: ${state}`);
   }
 }
 ```
 
-**IPFS Retrieval:**
+### Step 4 — Retrieve Output from IPFS
+
 ```typescript
-const ipfsResult = event?.data?.ipfsResult;
-const output = await client.ipfs.retrieve(ipfsResult);
+const rawOutput = await client.ipfs.retrieve(ipfsResult);
+// rawOutput must conform to ResultEnvelope schema
 ```
 
-### 3. Job Template System
+### Client Initialization
+
+```typescript
+const { createNosanaClient, NosanaNetwork } = await import("@nosana/kit");
+const client = createNosanaClient(NosanaNetwork.MAINNET, {
+  api: { apiKey: process.env.NOSANA_API_KEY }
+});
+```
+
+---
+
+## Job Template System
 
 **File**: `execution/nosana/job-templates.ts`
 
-Maps WAP3 task types to Nosana job specifications.
+Each workload template defines: `image`, `cmd`, `env`, `volumes`, and GPU resource requirements.
 
-**Job Specification Structure:**
+### Generic Template Structure
+
 ```typescript
 {
   version: "0.1",
   type: "container",
   meta: {
     trigger: "api",
-    system_requirements: { required_vram: 8 }
+    system_requirements: { required_vram: 8 }   // GB
   },
-  global: {
-    work_dir: "/workspace"
-  },
+  global: { work_dir: "/workspace" },
   ops: [{
     type: "container/run",
     id: "wap3-<taskType>-task",
     args: {
       gpu: true,
       image: "python:3.10-slim",
-      cmd: ["<execution commands>"],
-      env: { TASK_TYPE: "...", INPUTS_JSON: "..." },
+      cmd: ["python", "-c", "<execution script>"],
+      env: {
+        TASK_TYPE: "<taskType>",
+        INPUTS_JSON: JSON.stringify(inputs)
+      },
       volumes: [{ name: "nosana-output", dest: "/nosana/output" }]
     }
   }]
 }
 ```
 
----
+### GPU Workload Catalog (PredictorIQ)
 
-## Data Flow
-
-### Task Submission Flow
-
-```
-1. Application creates ExecutionJob
-   ↓
-2. Nosana layer generates job specification
-   ↓
-3. Submit to Nosana via client.api.jobs.create()
-   ↓
-4. Receive job ID from Nosana
-   ↓
-5. Return ExecutionReceipt to application
-```
-
-### Monitoring Flow
-
-```
-1. Application calls waitForCompletion()
-   ↓
-2. Nosana layer starts event stream via client.jobs.monitor()
-   ↓
-3. Filter events for target job ID
-   ↓
-4. Track state changes (submitted → running → completed)
-   ↓
-5. Extract IPFS hash from completion event
-   ↓
-6. Retrieve output via client.ipfs.retrieve()
-   ↓
-7. Parse and return ExecutionResult
-```
-
-### Integration with Escrow
-
-```
-1. Buyer creates task intent (AP2)
-   ↓
-2. Payment trigger defined (X402)
-   ↓
-3. Escrow created on-chain with locked funds
-   ↓
-4. Task submitted to Nosana execution layer
-   ↓
-5. Agent monitors execution to completion
-   ↓
-6. Generate proof hash from execution result
-   ↓
-7. Submit proof to escrow smart contract
-   ↓
-8. Escrow validates and releases payment
-```
+| Template | Workload | Container Image | Output |
+|---|---|---|---|
+| `monte_carlo_pricing` | Option-style pricing / Monte Carlo simulation | `python:3.10-slim` + scipy | Risk-neutral probability range, scenario stats |
+| `market_embedding` | Market text embedding + similarity clustering | `python:3.10-slim` + sentence-transformers | Embeddings, cluster map, top matches |
+| `backtest_replay` | Historical strategy backtest & replay | `python:3.10-slim` + pandas | Metrics, traces, reproducible seed/config |
 
 ---
 
-## Nosana SDK Usage
+## ResultEnvelope Schema
 
-### API Endpoints Used
+All job outputs must conform to this envelope (target: `execution/nosana/result-schema.ts`):
 
-**1. Client Creation**
 ```typescript
-createNosanaClient(NosanaNetwork.MAINNET, { api: { apiKey } })
+interface ResultEnvelope {
+  ok: boolean;
+  task: string;                    // template name
+  version: "1.0";
+  inputs: Record<string, unknown>;
+  result: Record<string, unknown>; // workload-specific output
+  diagnostics?: {
+    duration_ms: number;
+    output_hash: string;           // sha256 of result JSON
+  };
+}
 ```
 
-**2. Job Submission**
+**Output path inside container**: `/nosana/output/result.json`
+
+---
+
+## Execution Record & Metering
+
+Every completed job produces a structured record for audit and billing:
+
 ```typescript
-client.api.jobs.create({ market, jobDefinition })
+interface ExecutionRecord {
+  jobId: string;           // Nosana job ID
+  market: string;          // Nosana market address
+  submittedAt: string;     // ISO timestamp
+  startedAt?: string;
+  finishedAt?: string;
+  state: ExecutionStatus;
+  ipfsHash: string;        // pinned job definition
+  ipfsResult?: string;     // output IPFS hash
+  resourceUsage?: {
+    gpu_count: number;     // default: 1 if unknown
+    gpu_hours: number;     // (finishedAt - startedAt) / 3600 * gpu_count
+  };
+  outputHash?: string;     // sha256 of ResultEnvelope
+  error?: string;
+}
 ```
 
-**3. Event Monitoring**
-```typescript
-client.jobs.monitor()
+**GPU-hours formula:**
+
+```
+gpu_hours = (finishedAt_epoch - startedAt_epoch) / 3600 × gpu_count
 ```
 
-**4. IPFS Retrieval**
-```typescript
-client.ipfs.retrieve(ipfsHash)
-```
+`gpu_count` defaults to `1` when not reported by the node; stored explicitly in the record.
 
-### Event Schema
+---
 
-Events received from `monitor()` contain:
-```typescript
-{
-  data: {
-    id: string,           // Job ID
-    state: string,        // Job state (running, completed, etc.)
-    ipfsResult?: string   // IPFS hash when completed
+## Integration with Escrow
+
+```mermaid
+%%{init: {
+  "theme": "base",
+  "themeVariables": {
+    "primaryColor": "#0288D1",
+    "primaryTextColor": "#FFFFFF",
+    "primaryBorderColor": "#01579B",
+    "lineColor": "#4FC3F7",
+    "fontFamily": "Inter, system-ui, sans-serif",
+    "fontSize": "18px"
   }
-}
+}}%%
+flowchart TB
+    subgraph BUYER["👤  BUYER"]
+        B1["AP2 Intent + X402 Trigger<br/>─────────────<br/>Task definition · Payment conditions"]
+        B2["submitProof()<br/>─────────────<br/>outputHash submitted"]
+        B3["releasePayment()<br/>─────────────<br/>Agent paid ✓"]
+    end
+
+    subgraph NOS["⚡  NOSANA LAYER"]
+        N1["ipfs.pin()<br/>─────────────<br/>Job definition → IPFS hash"]
+        N2["jobs.post()<br/>─────────────<br/>market · timeout · ipfsHash"]
+        N3["jobs.monitor()<br/>─────────────<br/>Real-time state transitions"]
+        N4["ipfs.retrieve()<br/>─────────────<br/>ResultEnvelope fetched"]
+        N5["validate + meter<br/>─────────────<br/>gpu_hours computed"]
+        N1 --> N2 --> N3 --> N4 --> N5
+    end
+
+    subgraph ESCROW["🔐  WAP3 ESCROW  (on-chain)"]
+        E1["createEscrow()<br/>─────────────<br/>Funds locked on-chain"]
+        E2["proofHash stored<br/>─────────────<br/>Immutable on-chain record"]
+        E3["payment released<br/>─────────────<br/>Settled to agent"]
+    end
+
+    B1 -->|"lock funds"| E1
+    E1 -->|"dispatch task"| N1
+    N5 -->|"ExecutionResult"| B2
+    B2 -->|"proof on-chain"| E2
+    E2 --> B3
+    B3 -->|"settle"| E3
+
+    classDef buyerNode fill:#29B6F6,stroke:#0277BD,color:#FFFFFF,font-size:17px,font-weight:bold
+    classDef escrowNode fill:#4DB6AC,stroke:#00796B,color:#FFFFFF,font-size:17px,font-weight:bold
+    classDef nosNode fill:#FFB300,stroke:#E65100,color:#1A0A00,font-size:17px,font-weight:bold
+
+    class B1,B2,B3 buyerNode
+    class E1,E2,E3 escrowNode
+    class N1,N2,N3,N4,N5 nosNode
+
+    style BUYER fill:#E1F5FE,stroke:#0288D1,color:#003050,font-size:16px
+    style NOS fill:#FFF8E1,stroke:#FFB300,color:#3E2000,font-size:16px
+    style ESCROW fill:#E0F2F1,stroke:#00796B,color:#003050,font-size:16px
 ```
 
 ---
 
-## Job Execution Environment
+## Error Handling & Graceful Degradation
 
-### Container Configuration
+The layer falls back to **mock mode** automatically when:
 
-- **Base Image**: python:3.10-slim
-- **GPU**: Enabled (8GB VRAM required)
-- **Working Directory**: /workspace
-- **Output Directory**: /nosana/output (mounted volume)
+1. `USE_NOSANA_REAL` is not set to `"true"`
+2. `NOSANA_API_KEY` or `NOSANA_MARKET` are missing
+3. `@nosana/kit` SDK is not installed
+4. API or network errors occur
 
-### Task Input/Output
+Mock mode simulates the full `pin → post → monitor → retrieve` cycle locally with configurable delay, enabling zero-dependency development and CI.
 
-**Input**: Passed via environment variables
-```typescript
-env: {
-  TASK_TYPE: "market_similarity",
-  INPUTS_JSON: JSON.stringify(inputs)
-}
+### Logging Pattern
+
 ```
-
-**Output**: Written to `/nosana/output/result.json`
-```json
-{
-  "ok": true,
-  "task": "market_similarity",
-  "inputs": { ... },
-  "result": { ... }
-}
-```
-
----
-
-## Error Handling
-
-### Graceful Degradation
-
-The system implements automatic fallback to mock mode in these scenarios:
-
-1. **SDK Not Available**: `@nosana/kit` not installed
-2. **Missing Credentials**: API key or market address not configured
-3. **API Failures**: Network issues or service errors
-
-### Logging
-
-All operations are logged with `[nosana]` prefix and trace IDs for debugging:
-```
-[nosana][trace=exec_123] Creating job with market: <address>
-[nosana][trace=exec_123] Job created successfully, id: <job-id>
-[nosana][trace=exec_123] Monitoring job: <job-id>
-[nosana][trace=exec_123] Event received: state=completed
-[nosana][trace=exec_123] IPFS retrieve successful
+[nosana][trace=exec_abc123] Pinning job definition to IPFS...
+[nosana][trace=exec_abc123] ipfsHash=Qm...
+[nosana][trace=exec_abc123] Posting job to market: <address>
+[nosana][trace=exec_abc123] nosanaJobId=<id>
+[nosana][trace=exec_abc123] Monitoring state transitions...
+[nosana][trace=exec_abc123] state=running
+[nosana][trace=exec_abc123] state=completed  ipfsResult=Qm...
+[nosana][trace=exec_abc123] Retrieved ResultEnvelope, outputHash=sha256:...
+[nosana][trace=exec_abc123] gpu_hours=0.0083 (30s × 1 GPU)
 ```
 
 ---
@@ -283,125 +400,254 @@ All operations are logged with `[nosana]` prefix and trace IDs for debugging:
 ### Environment Variables
 
 | Variable | Required | Description |
-|----------|----------|-------------|
-| `USE_NOSANA_REAL` | No | Enable real API (default: false) |
-| `NOSANA_API_KEY` | Yes (real mode) | Nosana API authentication key |
-| `NOSANA_MARKET` | Yes (real mode) | Nosana market address for job submission |
+|---|---|---|
+| `USE_NOSANA_REAL` | No | Set `"true"` to enable real Nosana API (default: mock) |
+| `NOSANA_API_KEY` | Real mode | Nosana API authentication key |
+| `NOSANA_MARKET` | Real mode | Nosana market address for job submission |
 
-### Mode Selection
+### Quick Start
 
-**Mock Mode** (default):
-- No configuration needed
-- Simulates job execution locally
-- Returns mock results after 800ms delay
-- Used for testing and development
+```bash
+# Mock mode (default) — no credentials needed
+npm run demo:nosana
 
-**Real API Mode**:
-- Requires environment variables
-- Connects to Nosana Mainnet
-- Uses real GPU resources
-- Returns actual execution results from IPFS
+# Real Nosana Mainnet
+USE_NOSANA_REAL=true \
+NOSANA_API_KEY=<your-key> \
+NOSANA_MARKET=<market-address> \
+npm run demo:nosana-escrow
+```
+
+---
+
+## Running Demos
+
+| Command | Description |
+|---|---|
+| `npm run demo:nosana` | Standalone Nosana execution demo (mock or real) |
+| `npm run demo:nosana-escrow` | Full end-to-end: escrow → GPU job → proof → settlement |
+| `npm test:nosana` | Automated integration test suite with report output |
+
+Demo output artifacts are written to `demo/out/`.
 
 ---
 
 ## Performance Characteristics
 
-### Latency
-
-- **Job Submission**: ~100-500ms (API call)
-- **Execution Time**: Varies by task (typically 10-60 seconds)
-- **Event Monitoring**: Real-time streaming
-- **IPFS Retrieval**: ~1-5 seconds
-
-### Scalability
-
-- **Concurrent Jobs**: Limited by Nosana market capacity
-- **Event Stream**: Single stream monitors multiple jobs
-- **Job Filtering**: Client-side filtering by job ID
+| Phase | Latency |
+|---|---|
+| `ipfs.pin()` | ~200–800ms |
+| `jobs.post()` | ~100–500ms |
+| GPU execution | 10–120s (workload-dependent) |
+| `ipfs.retrieve()` | ~1–5s |
+| Total round-trip | ~15–130s |
 
 ---
 
-## Security Considerations
+## Security
 
-### API Credentials
-
-- API keys stored in environment variables
-- Never committed to version control
-- Scoped to specific markets
-
-### IPFS Data
-
-- Job outputs stored in public IPFS
-- Consider encryption for sensitive data
-- Results are content-addressed (immutable)
-
-### Proof Generation
-
-- Execution results hashed for on-chain verification
-- Hash includes job ID, outputs, and timestamp
-- Prevents result tampering
-
----
-
-## Testing
-
-### Test Coverage
-
-1. **Standalone Execution** (`demo/nosana-execution-demo.ts`)
-   - Job submission
-   - Completion monitoring
-   - Result retrieval
-
-2. **Escrow Integration** (`demo/nosana-escrow-integration-demo.ts`)
-   - End-to-end workflow
-   - Proof generation
-   - Payment settlement
-
-3. **Automated Test Suite** (`demo/test_nosana_integration.sh`)
-   - Runs both demos
-   - Validates outputs
-   - Generates test reports
-
-### Mock vs Real Testing
-
-**Mock Mode**: Fast, reliable, no external dependencies
-**Real Mode**: Tests actual Nosana integration, requires API access
-
----
-
-## Future Enhancements
-
-### Planned Features
-
-- Additional compute providers (Akash, etc.)
-- Retry logic for transient failures
-- Job cost estimation
-- Batch job submission
-- Custom container images
-- Result encryption
-
-### Extensibility
-
-The provider-agnostic design allows easy addition of new compute providers:
-
-```typescript
-// execution/akash/akash-layer.ts
-export class AkashExecutionLayer implements ExecutionLayer {
-  async submit(job: ExecutionJob): Promise<ExecutionReceipt> {
-    // Akash-specific implementation
-  }
-  
-  async waitForCompletion(executionId: string): Promise<ExecutionResult> {
-    // Akash-specific implementation
-  }
-}
-```
+- API keys in environment variables; never committed to version control
+- IPFS outputs are content-addressed (immutable); for sensitive data, encrypt before pinning
+- `outputHash` (sha256 of `ResultEnvelope`) is submitted on-chain as the proof — binds the settlement to a specific, unalterable result
+- `ExecutionRecord` is persisted locally for auditability independent of on-chain state
 
 ---
 
 ## References
 
 - Nosana SDK: `@nosana/kit` v2.0.38
-- Nosana Network: https://nosana.io
-- IPFS: https://ipfs.io
-- WAP3 Technical Documentation: `TECHNICAL.md`
+- Nosana Docs: https://docs.nosana.io
+- WAP3 Technical Reference: `TECHNICAL.md`
+- Contract ABI: `artifacts/contracts/AgentEscrow.sol/AgentEscrow.json`
+
+---
+
+## Implementation Requirements
+
+> **Purpose**: demonstrate real SDK usage through two concrete GPU-backed workflows, aligned with WAP3 escrow + PredictorIQ as the reference vertical.
+
+---
+
+### Background & Goals
+
+This is a **demo-first integration** targeting Nosana as audience. The objective is to show that WAP3 can use Nosana as its default GPU execution backend in a credible, repeatable way — not a toy example. Two recurring, domain-relevant workflows are required to demonstrate sustainable usage patterns (not one-off jobs).
+
+Key design constraints that must be reflected in all deliverables:
+
+- **Execution / settlement separation**: Nosana owns container execution and IPFS output storage. WAP3 owns escrow, proof submission, and on-chain provenance. Neither layer bleeds into the other.
+- **GPU-hours as a first-class metric**: every job must record `startedAt`, `finishedAt`, and `gpu_count` so that `gpu_hours = (finishedAt − startedAt) / 3600 × gpu_count` can be computed and stored in `ExecutionRecord`.
+- **Recurring workload pattern**: workflows are triggered per-market on a schedule, not just once. The usage model formula `active_markets × jobs_per_market_per_day × avg_gpu_time_per_job` must be demonstrable.
+- **Minimal scope**: only the two workflows below. Option pricing and backtesting are explicitly out of scope for this iteration.
+
+---
+
+### Workflow #1 — Cross-venue Market Matching
+
+**What it does**: given a "seed" prediction market (from any venue), find the top-K semantically equivalent markets across other venues, and determine whether they represent a tradeable equivalent contract.
+
+**Why GPU**: embedding generation and similarity search over a large candidate corpus benefit from GPU acceleration even at small scale; this is the canonical use case for GPU-backed ML inference on Nosana.
+
+#### Inputs
+
+```json
+{
+  "seed_market": {
+    "venue": "polymarket",
+    "market_id": "string",
+    "title": "string",
+    "description": "string",
+    "outcomes": ["Yes", "No"],
+    "time_window": { "start": "ISO8601", "end": "ISO8601" }
+  },
+  "candidates": [ /* same shape, from other venues */ ],
+  "top_k": 5
+}
+```
+
+#### Outputs
+
+```json
+{
+  "matches": [
+    {
+      "market_id": "string",
+      "venue": "string",
+      "similarity_score": 0.0,
+      "canonical": {
+        "outcome_type": "binary | scalar | categorical",
+        "threshold": "string | null",
+        "expiry": "ISO8601"
+      },
+      "equivalent": true,
+      "reasons": ["string"]
+    }
+  ]
+}
+```
+
+#### Implementation checklist
+
+- [ ] New Nosana job template: `market_embedding` in `execution/nosana/job-templates.ts`
+- [ ] Python entrypoint: `execution/nosana/jobs/market_matcher/main.py`
+  - Canonicalize seed + candidate markets
+  - Generate embeddings using a small open model (e.g. `sentence-transformers/all-MiniLM-L6-v2`)
+  - Compute cosine similarity, retrieve top-K
+  - Apply hard equivalence filters (outcome type match, expiry overlap, threshold compatibility)
+  - Write `ResultEnvelope`-conformant JSON to `/nosana/output/result.json`
+- [ ] TypeScript glue in `execution/nosana/nosana-layer.ts`: `submitMarketMatchingJob(input)` → returns parsed match results
+- [ ] Input/output JSON schema + examples in `docs/specs/nosana-workflows.md`
+
+---
+
+### Workflow #2 — Market News Fetch & Digest
+
+**What it does**: given a seed market, fetch relevant news articles (CPU step, no paid APIs), then use a small open-weight LLM on GPU to produce a structured digest mapping news facts to contract terms.
+
+**Why GPU**: LLM inference for summarization and structured extraction. CPU-only summarization would be too slow for recurring per-market execution; this is the justification for the GPU step.
+
+**Split architecture**: the fetch step runs locally (RSS/search, free sources only); only the summarization/structuring step runs on Nosana. This keeps the Nosana job definition pure (GPU container, fixed inputs) while the orchestration layer handles pre-fetching.
+
+#### Inputs
+
+```json
+{
+  "market": { /* same seed market shape as Workflow #1 */ },
+  "articles": [
+    {
+      "title": "string",
+      "url": "string",
+      "source": "string",
+      "timestamp": "ISO8601",
+      "body": "string"
+    }
+  ],
+  "keywords": ["string"]
+}
+```
+
+#### Outputs
+
+```json
+{
+  "clusters": [
+    { "cluster_id": 0, "article_ids": [0, 2], "theme": "string" }
+  ],
+  "digest": {
+    "timeline": [ { "date": "ISO8601", "event": "string" } ],
+    "key_facts": ["string"],
+    "contract_mapping": "how the news maps to contract resolution terms"
+  }
+}
+```
+
+#### Implementation checklist
+
+- [ ] CPU pre-fetch step: `execution/nosana/jobs/news_digest/fetch.ts` — RSS + free search endpoints, no paid APIs; `TODO` markers where an API key would unlock more sources
+- [ ] New Nosana job template: `news_digest` in `execution/nosana/job-templates.ts`
+- [ ] Python entrypoint: `execution/nosana/jobs/news_digest/main.py`
+  - Accepts pre-fetched articles as input (passed via env var or volume)
+  - Deduplication + clustering
+  - LLM summarization + structured extraction (small open model, e.g. `Qwen/Qwen2.5-1.5B-Instruct`)
+  - Write `ResultEnvelope`-conformant JSON to `/nosana/output/result.json`
+- [ ] TypeScript orchestration: fetch locally → pass to `submitNewsDigestJob()` → parse results
+- [ ] Input/output JSON schema + examples in `docs/specs/nosana-workflows.md`
+
+---
+
+### GPU Usage Model
+
+Every job records:
+
+```
+gpu_hours = (finishedAt_epoch − startedAt_epoch) / 3600 × gpu_count
+```
+
+Recurring usage scales as:
+
+```
+total_daily_gpu_hours = active_markets × jobs_per_market_per_day × avg_gpu_time_per_job
+```
+
+Example baseline (conservative):
+
+| Parameter | Value |
+|---|---|
+| `active_markets` | 50 |
+| `jobs_per_market_per_day` | 4 (2× matching + 2× digest) |
+| `avg_gpu_time_per_job` | 45s |
+| **Daily GPU-hours** | **2.5 h** |
+
+This model must be documented in `docs/specs/gpu-usage-model.md` with the formula, the knobs, and worked examples showing how it scales.
+
+---
+
+### Documentation Deliverables
+
+| File | Status | Notes |
+|---|---|---|
+| `README.md` | update | Add "Nosana-backed Workflows" section: quickstart commands, how to run both workflows end-to-end, where outputs land |
+| `docs/PRODUCT_OVERVIEW.md` | new | Concise product overview: WAP3 core + PredictorIQ as reference vertical; why Nosana; what workloads; sustainable usage narrative |
+| `docs/ARCHITECTURE_OVERVIEW.md` | new | Architecture diagram + module descriptions: execution/nosana layer, job templates, result retrieval, settlement hooks, provenance records, monitoring |
+| `docs/specs/nosana-workflows.md` | new | JSON schema + examples for both workflow inputs/outputs |
+| `docs/specs/gpu-usage-model.md` | new | Usage model formula, knobs, worked examples |
+
+---
+
+### Runability Requirements
+
+All new code paths must be runnable locally:
+
+```bash
+# Mock mode (default, no credentials)
+npm run demo:nosana
+
+# Real Nosana Mainnet — both workflows
+USE_NOSANA_REAL=true \
+NOSANA_API_KEY=<key> \
+NOSANA_MARKET=<market-address> \
+npm run demo:nosana-escrow
+```
+
+- Output artifacts: `demo/out/`
+- IPFS hashes and `ExecutionRecord` objects logged per job
+- `TODO` markers in code wherever secrets or external endpoints are needed
