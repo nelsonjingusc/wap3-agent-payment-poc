@@ -12,77 +12,62 @@ WAP3 uses **Nosana as the primary and default GPU execution backend** for all AI
 %%{init: {
   "theme": "base",
   "themeVariables": {
-    "primaryColor": "#1E1E2E",
-    "primaryTextColor": "#CDD6F4",
-    "primaryBorderColor": "#585B70",
-    "lineColor": "#89DCEB",
-    "fontFamily": "Inter, system-ui, sans-serif",
-    "fontSize": "18px",
-    "edgeLabelBackground": "#1E1E2E"
+    "primaryColor": "#FFFFFF",
+    "primaryTextColor": "#000000",
+    "primaryBorderColor": "#000000",
+    "lineColor": "#000000",
+    "fontSize": "32px",
+    "fontFamily": "Inter, system-ui, sans-serif"
   }
 }}%%
 flowchart TB
-    subgraph AGENT["🤖  AGENT"]
-        A1["AP2 Intent<br/>─────────────<br/>Task · Budget · Requirements"]
-        A2["X402 Trigger<br/>─────────────<br/>Payment conditions met"]
-        A1 -->|"payment trigger"| A2
+    linkStyle default stroke-width:5px,fill:none,stroke:black,color:black,stroke:black
+
+    subgraph NOS_LAYER ["Nosana-Powered Execution Layer"]
+        direction LR
+        ND("dispatch job<br/>─────────────<br/>jobs.post() · market · ipfsHash")
+        
+        subgraph GPU_WORKLOADS ["GPU Workloads"]
+            direction TB
+            N1("Market Matching<br/>─────────────<br/>Embedding + similarity")
+            N2("News Digest<br/>─────────────<br/>Fetch → LLM summarize")
+            N3("Outcome Pricing<br/>─────────────<br/>Monte Carlo · probability")
+            N4("Agent Signals<br/>─────────────<br/>Scenario simulation")
+        end
+
+        NI("IPFS result<br/>─────────────<br/>ipfs.retrieve() · proof hash")
+
+        ND ==> GPU_WORKLOADS
+        GPU_WORKLOADS ==> NI
     end
 
-    subgraph ESCROW["🔐  WAP3 ESCROW  (on-chain)"]
-        P1["Lock Funds<br/>─────────────<br/>Funds locked on-chain"]
-        P2["Submit Proof<br/>─────────────<br/>outputHash on-chain"]
-        P3["Release Payment<br/>─────────────<br/>Settled to agent ✓"]
-        P1 --> P2 --> P3
+    subgraph WAP3_LAYER ["WAP3"]
+        direction TB
+        W1("Escrow<br/>─────────────<br/>Lock · release · refund funds")
+        W2("AP2 / X402<br/>─────────────<br/>Agent payment protocol")
+        W3("Settlement Rules<br/>─────────────<br/>Condition-based fund release")
+        W4("Provenance Record<br/>─────────────<br/>Agent · job · result · reason")
     end
 
-    subgraph NOSANA["⚡  NOSANA GPU EXECUTION"]
-        N1["① ipfs.pin()<br/>─────────────<br/>Job definition → IPFS"]
-        N2["② jobs.post()<br/>─────────────<br/>market · ipfsHash"]
-        N3["③ jobs.monitor()<br/>─────────────<br/>State transitions stream"]
-        N4["④ ipfs.retrieve()<br/>─────────────<br/>Output JSON result"]
-        N1 --> N2 --> N3 --> N4
-    end
+    %% Connect the layers
+    %% WAP3 (Bottom) initiates the process upwards to Nosana (Top)
+    WAP3_LAYER ==>|dispatch job + lock funds| NOS_LAYER
+    
+    %% Nosana (Top) returns the result downwards to WAP3 (Bottom)
+    NOS_LAYER ==>|job id + proof hash| WAP3_LAYER
 
-    subgraph WORK["📊  PredictorIQ  GPU Workloads"]
-        W1["Monte Carlo Pricing<br/>─────────────<br/>Risk-neutral probability range"]
-        W2["Market Embeddings<br/>─────────────<br/>Similarity clustering"]
-        W3["Backtest Replay<br/>─────────────<br/>Historical strategy replay"]
-    end
+    %% Styling
+    style NOS_LAYER  fill:#E8F5E9,stroke:#2E7D32,stroke-width:6px,color:#1B5E20,font-size:48px,font-weight:bold
+    style WAP3_LAYER fill:#E3F2FD,stroke:#1565C0,stroke-width:6px,color:#0D47A1,font-size:48px,font-weight:bold
+    style GPU_WORKLOADS fill:#FFFFFF,stroke:none,color:#000000,font-size:32px
 
-    subgraph SETTLE["✅  SETTLEMENT & AUDIT"]
-        S1["ResultEnvelope<br/>─────────────<br/>Structured output + hash"]
-        S2["Execution Record<br/>─────────────<br/>gpu_hours · metering"]
-        S3["On-chain Provenance<br/>─────────────<br/>Immutable audit trail"]
-        S1 --> S2 --> S3
-    end
+    classDef wap3Node fill:#FFFFFF,stroke:#1565C0,stroke-width:4px,color:#000000,rx:12,ry:12,font-weight:bold,font-size:32px,padding:25px
+    classDef nosNode  fill:#FFFFFF,stroke:#2E7D32,stroke-width:4px,color:#000000,rx:12,ry:12,font-weight:bold,font-size:32px,padding:25px
+    classDef ioNode   fill:#FFFFFF,stroke:#000000,stroke-width:4px,stroke-dasharray: 8 8,color:#000000,rx:12,ry:12,font-weight:bold,font-size:32px,padding:25px
 
-    A2     -->|"lock funds"| P1
-    P1     -->|"dispatch"| N1
-    N4     -->|"validate"| S1
-    S2     -->|"proof hash"| P2
-    P3     -->|"log"| S3
-
-    N2 -.->|"runs"| W1
-    N2 -.->|"runs"| W2
-    N2 -.->|"runs"| W3
-
-    classDef agentNode  fill:#F38BA8,stroke:#D20F39,color:#1E1E2E,font-weight:bold
-    classDef escrowNode fill:#89B4FA,stroke:#1E66F5,color:#1E1E2E,font-weight:bold
-    classDef nosNode    fill:#FAB387,stroke:#FE640B,color:#1E1E2E,font-weight:bold
-    classDef workNode   fill:#A6E3A1,stroke:#40A02B,color:#1E1E2E,font-weight:bold
-    classDef settleNode fill:#CBA6F7,stroke:#8839EF,color:#1E1E2E,font-weight:bold
-
-    class A1,A2 agentNode
-    class P1,P2,P3 escrowNode
+    class W1,W2,W3,W4 wap3Node
     class N1,N2,N3,N4 nosNode
-    class W1,W2,W3 workNode
-    class S1,S2,S3 settleNode
-
-    style AGENT   fill:#2A1A1A,stroke:#F38BA8,color:#F38BA8,font-weight:bold
-    style ESCROW  fill:#1A1A2A,stroke:#89B4FA,color:#89B4FA,font-weight:bold
-    style NOSANA  fill:#2A1A00,stroke:#FAB387,color:#FAB387,font-weight:bold
-    style WORK    fill:#1A2A1A,stroke:#A6E3A1,color:#A6E3A1,font-weight:bold
-    style SETTLE  fill:#1E1A2A,stroke:#CBA6F7,color:#CBA6F7,font-weight:bold
+    class ND,NI ioNode
 ```
 
 ---
