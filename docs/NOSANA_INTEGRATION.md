@@ -93,7 +93,7 @@ flowchart TB
         A1 -->|"payment trigger"| A2
     end
 
-    subgraph EXEC["🔌  EXECUTION"]
+    subgraph EXEC["🔌  EXECUTION Layer"]
         I["Execution Layer<br/>─────────────<br/>submit() · waitForCompletion()"]
     end
 
