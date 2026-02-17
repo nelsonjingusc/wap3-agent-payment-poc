@@ -77,6 +77,7 @@ class WAP3,NEL bigTitle;
 ```mermaid
 %%{init: {
   "theme": "base",
+  flowchart": { "htmlLabels": false }
   "themeVariables": {
     "fontSize": "13px",
     "fontFamily": "Inter, system-ui, sans-serif"
