@@ -338,6 +338,7 @@ gpu_hours = (finishedAt_epoch - startedAt_epoch) / 3600 × gpu_count
 ```mermaid
 %%{init: {
   "theme": "base",
+  "flowchart": { "htmlLabels": false },
   "themeVariables": {
     "primaryColor": "#0288D1",
     "primaryTextColor": "#FFFFFF",
