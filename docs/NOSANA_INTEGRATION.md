@@ -87,7 +87,7 @@ flowchart TB
 %% =====================
 %% WAP3 APPLICATION
 %% =====================
-subgraph APP["🤖  WAP3"]
+subgraph APP["🤖  WAP3 "]
     direction TB
     A1["AP2 Intent
 Task · Budget · Requirements"]
@@ -99,7 +99,7 @@ end
 %% =====================
 %% EXECUTION LAYER
 %% =====================
-subgraph EXEC["EXECUTION LAYER"]
+subgraph EXEC["EXECUTION LAYER "]
     I["submit()
 waitForCompletion()"]
 end
@@ -107,7 +107,7 @@ end
 %% =====================
 %% NOSANA SDK (FORCED HORIZONTAL)
 %% =====================
-subgraph NOS["NOSANA SDK"]
+subgraph NOS["NOSANA SDK "]
     direction LR
     N1["ipfs.pin()
 Job definition → IPFS"]
@@ -123,7 +123,7 @@ end
 %% =====================
 %% NETWORK (FORCED HORIZONTAL)
 %% =====================
-subgraph NET["NOSANA NETWORK"]
+subgraph NET["NOSANA NETWORK "]
     direction LR
     G["GPU Nodes
 Decentralized compute"]
