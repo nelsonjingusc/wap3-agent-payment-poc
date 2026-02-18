@@ -432,14 +432,17 @@ Mock mode simulates the full `pin → post → monitor → retrieve` cycle local
 ### Quick Start
 
 ```bash
-# Mock mode (default) — no credentials needed
+# Mock mode — no credentials needed, auto-plays with timed pauses
 npm run demo:nosana
 
-# Real Nosana Mainnet
+# Interactive mode — pauses at each step, press Enter to advance (good for live demos)
+npm run demo:nosana-live
+
+# Real Nosana Mainnet (either script)
 USE_NOSANA_REAL=true \
 NOSANA_API_KEY=<your-key> \
 NOSANA_MARKET=<market-address> \
-npm run demo:nosana-escrow
+npm run demo:nosana
 ```
 
 ---
@@ -448,9 +451,10 @@ npm run demo:nosana-escrow
 
 | Command | Description |
 |---|---|
-| `npm run demo:nosana` | Standalone Nosana execution demo (mock or real) |
-| `npm run demo:nosana-escrow` | Full end-to-end: escrow → GPU job → proof → settlement |
-| `npm test:nosana` | Automated integration test suite with report output |
+| `npm run demo:nosana` | Full demo — auto-plays with timed pauses between steps |
+| `npm run demo:nosana-live` | Full demo — pauses at each step and waits for Enter (best for live walkthroughs) |
+
+Both scripts run the same two workflows (Market Matching + News Digest) and show the full WAP3 × Nosana loop: job submission → GPU execution → IPFS result → proof hash.
 
 Demo output artifacts are written to `demo/out/`.
 
