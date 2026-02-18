@@ -37,7 +37,7 @@ In that context, the typical jobs I have in mind for agent workloads include:
 - **Heavier agent signal and scenario jobs.**
   These jobs simulate different paths or run more expensive models, such as large embedding models or smaller open-weight language models in a loop, to generate trading or risk signals that feed back into the agent's decision about whether to act.
 
-All of these can be expressed as container jobs that run on Nosana's GPU markets via `client.api.jobs.create(...)`, and then are monitored and resolved through `monitor()` and `ipfs.retrieve(...)` in the SDK.
+All of these can be expressed as container jobs that run on Nosana's GPU markets via `client.api.deployments.create(...)`, monitored by polling `client.api.deployments.get(...)`, and results retrieved through `client.ipfs.retrieve(...)` in the SDK.
 
 ### b. WAP3 as Settlement / Coordination Layer
 
@@ -112,10 +112,12 @@ Right now I am working towards a dedicated execution layer in the WAP3 prototype
 
 1. Initialize a Nosana client with an API key on MAINNET, using `createNosanaClient(NosanaNetwork.MAINNET, { api: { apiKey: ... } })`.
 
-2. Agents submit tasks with `execution_layer: "nosana"`. The execution layer translates this into a Nosana `jobDefinition` (single-container job with GPU enabled) and calls `client.ipfs.pin(jobDefinition)` to pin the job definition to IPFS, returning an `ipfsHash`.
+2. Agents submit tasks with `execution_layer: "nosana"`. The execution layer translates this into a Nosana job definition (single-container job with GPU enabled) and calls `client.api.deployments.create({ market, job_definition, ... })` via the Nosana REST API, which returns a deployment object with an `id`.
 
-3. The job is then submitted to the market via `client.jobs.post({ market, ipfsHash })`, which returns a `nosanaJobId`.
+3. The deployment is monitored by polling `client.api.deployments.get(deploymentId)` every 5 seconds. When the status reaches `RUNNING` or `STOPPED`, the result IPFS hash is extracted from the latest revision.
 
-4. I then use the `monitor()` API to watch for job events, filter for the matching job id, and when the state is `completed`, I call `client.ipfs.retrieve(ipfsResult)` to fetch the output payload.
+4. I call `client.ipfs.retrieve(ipfsHash)` to fetch the output payload.
+
+> **Note:** The REST API path (`deployments.create`) requires only a `NOSANA_API_KEY` and is suitable for the current integration and demo phase. The on-chain path (`ipfs.pin` → `jobs.post` → `monitor()`) requires a Solana wallet with NOS tokens and is the planned path for full production use.
 
 5. The result and metadata are passed back into the WAP3 settlement logic, which decides whether to release escrowed funds or not and records a provenance entry.
