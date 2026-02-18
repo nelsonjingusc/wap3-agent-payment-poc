@@ -58,18 +58,22 @@ export class NosanaExecutionLayer implements ExecutionLayer {
           return this.submitMock(job, executionId, spec);
         }
 
-        console.log(`[nosana][trace=${traceId}] Creating job with market:`, this.market);
-        const jobResponse = await client.api.jobs.create({
-          market: this.market,
-          jobDefinition: spec,
+        console.log(`[nosana][trace=${traceId}] Creating deployment with market:`, this.market);
+        const deployment = await client.api.deployments.create({
+          name: `wap3-${job.taskType}-${Date.now()}`,
+          market: this.market!,
+          replicas: 1,
+          timeout: 300,
+          job_definition: spec,
         });
 
-        if (!jobResponse || !jobResponse.id) {
-          console.error(`[nosana][trace=${traceId}] Job creation response:`, JSON.stringify(jobResponse ?? {}));
-          throw new Error("Failed to create Nosana job: no job ID returned");
+        if (!deployment || !deployment.id) {
+          console.error(`[nosana][trace=${traceId}] Deployment creation response:`, JSON.stringify(deployment ?? {}));
+          throw new Error("Failed to create Nosana deployment: no ID returned");
         }
 
-        const providerJobId = jobResponse.id;
+        const providerJobId = deployment.id;
+        console.log(`[nosana][trace=${traceId}] Deployment created, status: ${deployment.status}`);
         console.log(`[nosana][trace=${traceId}] Job created successfully, id: ${providerJobId} (using this ID for monitor)`);
         this.executions.set(executionId, {
           providerJobId,
@@ -123,104 +127,70 @@ export class NosanaExecutionLayer implements ExecutionLayer {
 
         const targetJobId = meta.providerJobId;
         if (!targetJobId) {
-          throw new Error(`[nosana][trace=${traceId}] Missing jobId for monitor()`);
+          throw new Error(`[nosana][trace=${traceId}] Missing deployment ID`);
         }
-        console.log(`[nosana][trace=${traceId}] Monitoring job: ${targetJobId}`);
 
-        const [events, stop] = await client.jobs.monitor();
+        console.log(`[nosana][trace=${traceId}] Polling deployment status: ${targetJobId}`);
 
-        try {
-          for await (const event of events) {
-            const evJobId = event?.data?.id || event?.data?.job || event?.data?.jobId || event?.jobId;
-            if (!evJobId || evJobId !== targetJobId) continue;
+        const POLL_INTERVAL_MS = 5000;
+        const MAX_POLLS = 120; // 10 minutes max
 
-            const state = event?.data?.state;
-            const ipfsResult = event?.data?.ipfsResult || event?.data?.result?.ipfs || event?.data?.ipfs;
-            
-            console.log(`[nosana][trace=${traceId}] Event received (raw):`, JSON.stringify(event?.data ?? {}));
-            console.log(`[nosana][trace=${traceId}] Event parsed: jobId=${evJobId}, state=${state}, ipfsResult=${ipfsResult || 'N/A'}`);
+        for (let i = 0; i < MAX_POLLS; i++) {
+          await new Promise(r => setTimeout(r, POLL_INTERVAL_MS));
 
-            const normalized = String(state || "").toLowerCase();
+          const dep = await client.api.deployments.get(targetJobId);
+          const status = dep?.status ?? "UNKNOWN";
+          console.log(`[nosana][trace=${traceId}] poll=${i + 1} status=${status}`);
 
-            if (["done", "completed", "success"].includes(normalized)) {
-              console.log(`[nosana][trace=${traceId}] Job completed, ipfsResult: ${ipfsResult || 'N/A'}`);
-              
-              if (!ipfsResult) {
-                console.warn(`[nosana][trace=${traceId}] No ipfsResult found in event data, available fields:`, Object.keys(event?.data ?? {}));
-                return {
-                  status: "SUCCEEDED",
-                  output: event?.data ?? {},
-                  providerJobId: targetJobId,
-                  logs: "completed but no ipfsResult found",
-                };
-              }
+          if (status === "RUNNING" || status === "STOPPED") {
+            // Extract ipfs result hash from latest revision
+            const latestRevision = dep?.revisions?.[dep.revisions.length - 1];
+            const ipfsResult = latestRevision?.ipfs_definition_hash;
 
-              console.log(`[nosana][trace=${traceId}] Retrieving IPFS result from: ${ipfsResult}`);
-              try {
-                const output = await client.ipfs.retrieve(ipfsResult);
-                
-                // Check if output is a file path or JSON content
-                let parsedOutput = output;
-                if (typeof output === 'string') {
-                  try {
-                    parsedOutput = JSON.parse(output);
-                  } catch {
-                    // If not JSON, check if it's a file path reference
-                    if (output.includes('result.json') || output.includes('/nosana/output')) {
-                      console.warn(`[nosana][trace=${traceId}] Output appears to be a file path, not content: ${output}`);
-                    }
-                  }
-                }
-                
-                // Verify result.json structure if output is an object
-                if (typeof parsedOutput === 'object' && parsedOutput !== null) {
-                  const outputKeys = Object.keys(parsedOutput);
-                  console.log(`[nosana][trace=${traceId}] IPFS retrieve successful, output type: ${typeof parsedOutput}, keys: ${outputKeys.join(',')}`);
-                  
-                  // Check if result.json content is present
-                  if (outputKeys.length === 0) {
-                    console.warn(`[nosana][trace=${traceId}] Output object is empty, possible volume mount issue`);
-                  }
-                } else {
-                  console.log(`[nosana][trace=${traceId}] IPFS retrieve successful, output type: ${typeof parsedOutput}`);
-                }
-
-                return {
-                  status: "SUCCEEDED",
-                  output: parsedOutput,
-                  providerJobId: targetJobId,
-                  logs: "completed via monitor()",
-                };
-              } catch (ipfsError: any) {
-                console.error(`[nosana][trace=${traceId}] IPFS retrieve failed: ${ipfsError.message}`);
-                // Return real job result with error, don't fallback to mock
-                return {
-                  status: "SUCCEEDED",
-                  output: {
-                    jobId: targetJobId,
-                    ipfsResult,
-                    error: ipfsError.message,
-                    note: "Job completed but IPFS retrieve failed"
-                  },
-                  providerJobId: targetJobId,
-                  logs: `IPFS retrieve failed: ${ipfsError.message}`,
-                };
-              }
+            if (!ipfsResult) {
+              return {
+                status: "SUCCEEDED",
+                output: dep,
+                providerJobId: targetJobId,
+                logs: `deployment ${status}, no ipfs result hash`,
+              };
             }
 
-            if (["stopped", "failed", "error"].includes(normalized)) {
+            console.log(`[nosana][trace=${traceId}] Retrieving IPFS result: ${ipfsResult}`);
+            try {
+              const output = await client.ipfs.retrieve(ipfsResult);
+              let parsedOutput = output;
+              if (typeof output === "string") {
+                try { parsedOutput = JSON.parse(output); } catch { /* keep as string */ }
+              }
+              console.log(`[nosana][trace=${traceId}] IPFS retrieve successful`);
               return {
-                status: "FAILED",
+                status: "SUCCEEDED",
+                output: parsedOutput,
                 providerJobId: targetJobId,
-                logs: JSON.stringify(event?.data ?? {}),
+                logs: `completed via deployments.get() polling`,
+              };
+            } catch (ipfsError: any) {
+              console.error(`[nosana][trace=${traceId}] IPFS retrieve failed: ${ipfsError.message}`);
+              return {
+                status: "SUCCEEDED",
+                output: { deploymentId: targetJobId, ipfsResult, error: ipfsError.message },
+                providerJobId: targetJobId,
+                logs: `IPFS retrieve failed: ${ipfsError.message}`,
               };
             }
           }
 
-          return { status: "FAILED", providerJobId: targetJobId, logs: "monitor stream ended" };
-        } finally {
-          stop?.();
+          if (status === "ERROR" || status === "ARCHIVED") {
+            return {
+              status: "FAILED",
+              providerJobId: targetJobId,
+              logs: `deployment status: ${status}`,
+            };
+          }
         }
+
+        return { status: "FAILED", providerJobId: targetJobId, logs: "polling timeout after 10 minutes" };
       } catch (error: any) {
         console.error(`[nosana][trace=${traceId}] Real API monitoring failed, falling back to mock:`, error.message);
         return this.waitForCompletionMock(executionId, meta);
