@@ -10,7 +10,7 @@ Current GPU usage is validation-focused rather than production-scale.
 
 We've been running live end-to-end execution tests — container build, Nosana job submission, monitoring, IPFS retrieval, proof hash generation, and settlement — to validate the complete execution loop.
 
-What we have not turned on yet is sustained recurring workload coverage across large sets of live markets. The execution pipeline itself is fully functional; the transition ahead is scaling that validated loop into continuous, programmatic usage.
+What we have not turned on yet is recurring workload coverage across large sets of live markets. The execution pipeline itself is functional; the transition ahead is scaling that validated loop into continuous, programmatic usage.
 
 ---
 
@@ -27,7 +27,7 @@ We run three recurring workload types, all containerized and integrated into the
    Converting market descriptions into embedding vectors (e.g., `sentence-transformers/all-MiniLM-L6-v2`) and identifying semantically equivalent markets across venues using similarity scoring plus structural compatibility filters.
 
 3. **News digest**
-   Fetching relevant articles and running a lightweight open-weight LLM (e.g., Llama or Mistral via Ollama) to produce structured summaries tied directly to a market's resolution criteria.
+   Fetching relevant articles and running a lightweight open-weight LLM (e.g., Llama or Ollama) to produce structured summaries tied directly to a market's resolution criteria.
 
 Market matching and news digest are already integrated and running in the demo through Nosana-backed container jobs. Outcome pricing follows the same execution pattern and is next in the integration queue.
 
@@ -49,7 +49,7 @@ The scaling model is straightforward:
 
 > (active markets) × (jobs per market per day) × (average GPU time per job)
 
-Each additional market covered by an agent produces additional Nosana jobs. Usage scales linearly with market coverage rather than through isolated batch spikes.
+Each additional market covered by an agent produces additional Nosana jobs. Usage scales linearly with market coverage.
 
 ---
 
@@ -76,7 +76,7 @@ The next step is connecting to a live Nosana market with production API credenti
 
 **Q: How much time can you realistically commit?**
 
-Full-time (100%). This is my primary and only project. I hold a PhD in Computer Science and have over 20 years of production engineering experience in distributed systems, financial infrastructure, and AI pipelines.
+Full-time (100%). This is my primary and only project. 
 
 ---
 
@@ -116,7 +116,7 @@ Verification is straightforward: run the demo script using an API key and market
 
 **Q: Biggest risk to this project?**
 
-Execution speed as a single-founder project.
+Execution speed.
 
 Mitigation strategy:
 

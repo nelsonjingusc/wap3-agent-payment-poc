@@ -2,7 +2,7 @@
 
 ---
 
-**Q1: Is the plan that Nosana will be the exclusive launch GPU provider for WAP3?**
+## Q1: Is the plan that Nosana will be the exclusive launch GPU provider for WAP3?
 
 For the WAP3 launch, the plan is to treat Nosana as the primary and effectively exclusive GPU provider for GPU-backed agent workloads.
 
@@ -12,7 +12,7 @@ On the protocol level, WAP3 stays technically compute-agnostic, but for this gra
 
 ---
 
-**Q2: Could you provide some clarification of the difference between Nosana as the execution layer and WAP3 as the settlement layer?**
+## Q2: Could you provide some clarification of the difference between Nosana as the execution layer and WAP3 as the settlement layer?
 
 The separation I have in mind and am developing against is:
 
@@ -48,7 +48,7 @@ So simply put: Nosana runs the containers and GPUs; WAP3 holds and releases the 
 
 ---
 
-**Q3: Could you please provide some clarification on how much compute you are currently using and how much compute you predict WAP3 will be using?**
+## Q3: Could you please provide some clarification on how much compute you are currently using and how much compute you predict WAP3 will be using?
 
 Right now, actual GPU usage on Nosana is still small, because I just finished wiring the Nosana execution layer into the WAP3 prototype and I'm only running small integration tests.
 
@@ -70,7 +70,7 @@ These numbers are conservative but realistic for a single-founder project that i
 
 ---
 
-**Q4: How much does WAP3 intend to spend on compute?**
+## Q4: How much does WAP3 intend to spend on compute?
 
 Agree that a large chunk of the grant should go into compute credits, so out of the requested USD 35,000:
 
@@ -81,7 +81,7 @@ If the Grants team feels the allocation should be adjusted further, I'm open to 
 
 ---
 
-**Q5: How do you foresee this project will continue to run after the allocation of the grant funds?**
+## Q5: How do you foresee this project will continue to run after the allocation of the grant funds?
 
 Compute is an operating cost. In the long run, it should be covered by users whose agents are consuming GPU resources.
 
@@ -94,7 +94,7 @@ In other words, the grant helps me fund the initial integration and the first 6 
 
 ---
 
-**Q6: Could you provide some info on how you are currently using the Nosana SDK?**
+## Q6: Could you provide some info on how you are currently using the Nosana SDK?
 
 Right now I am working towards a dedicated execution layer in the WAP3 prototype that wraps the `@nosana/kit` v2 client:
 
