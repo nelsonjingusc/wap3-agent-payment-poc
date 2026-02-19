@@ -18,7 +18,7 @@ import * as readline from "readline";
 const C = {
   reset:   "\x1b[0m",
   bold:    "\x1b[1m",
-  dim:     "\x1b[2m",
+  dim:     "\x1b[34m",  // changed from gray (\x1b[2m) to blue (\x1b[34m)
   cyan:    "\x1b[36m",
   green:   "\x1b[32m",
   yellow:  "\x1b[33m",
