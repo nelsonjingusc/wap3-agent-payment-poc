@@ -1,4 +1,4 @@
-# WAP3 × Nosana — Integration Q&A
+# WAP3 × Nosana — Q&A (Proposal & Email)
 
 ---
 
